@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS SHEETS(
+	username TEXT NOT NULL,
+	sheetname TEXT NOT NULL,
+	path TEXT NOT NULL,
+	PRIMARY KEY (username, sheetname, path)
+	FOREIGN KEY (username) REFERENCES USERS(username) ON DELETE CASCADE
+);
+
