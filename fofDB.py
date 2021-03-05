@@ -1,28 +1,30 @@
+# IMPORTS
 from Crypto.Hash import SHA256 as sha
 import sqlite3 as sql
 import os
-
+# NAME OF DB FILE
 dbName = "fof.db"
-
+# Establish a connection that enforces foreign keys and returns Row objects
+# from all queries
 def connect() -> sql.Connection:
 	conn = sql.connect(dbName)
 	conn.row_factory = sql.Row
 	conn.cursor().execute("PRAGMA foreign_keys = ON")
 
 	return conn
-
+# Execute a SQL command over an existing connection
 def query(conn : sql.Connection, sql : str, params : dict = {}) -> list:
 	if len(params) == 0:
 		return conn.cursor().execute(sql).fetchall()
 	else:
 		return conn.cursor().execute(sql, params).fetchall()
-
+# Convert Row objects in a query response to dictionaries
 def dictionize(response : list) -> list:
 	return [dict(row) for row in response]
-
+# Wrap dictionize around query for ease of code
 def qd(conn : sql.Connection, sql : str, params : dict = {}) -> list:
 	return dictionize(query(conn, sql, params))
-
+# Make a one-time connection and run one read query
 def queryRead(query : str, params : list = []) -> list:
 	conn = connect()
 
@@ -34,7 +36,7 @@ def queryRead(query : str, params : list = []) -> list:
 	else:
 		conn.close()
 		return response
-
+# Make a one-time connection and run one write query
 def queryWrite(query : str, params : dict = {}) -> list:
 	conn = connect()
 
@@ -47,7 +49,7 @@ def queryWrite(query : str, params : dict = {}) -> list:
 		conn.commit()
 		conn.close()
 		return response
-
+# Create the tables needed for FoF using scripts in ./sql
 def createTables():
 	tableData = ({
 		"name" : "USERS",
@@ -79,18 +81,19 @@ AND NAME = :name;""",
 	
 	conn.commit()
 	conn.close()
-
+# Computer a hash h(p || s) for a password p and salt s
 def doHash(password : str, salt : str) -> str:
 	h = sha.new()
 	h.update(bytes(password + salt, "utf8"))
 	return h.hexdigest()
-
+# Check if an inputted password matches the recorded salted-hash
 def checkPassword(password : str, salt : str, hash : str) -> bool:
 	hashComputed = doHash(password, salt)
 	print(hash)
 	print(hashComputed)
 	return hash == hashComputed
-
+# Add a new row to the users table without storing the password
+# ONLY USE AFTER VALIDATING THE PASSWORD AS STRONG
 def createUser(username : str, password : str):
 	duplicateSalts = [None]
 	while len(duplicateSalts) > 0:
