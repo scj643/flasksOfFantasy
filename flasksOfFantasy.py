@@ -78,8 +78,16 @@ def logout():
 	return fl.redirect(fl.url_for("login"))
 
 def userpage():
+	testSheets = [
+		{"name": "Foo", "link": "/sheet/foo"},
+		{"name": "Jym", "link": "/sheet/jym"}
+	]		
 	if "user" in fl.session:
-		return fl.render_template("userpage.html", user = fl.session["user"])
+		return fl.render_template(
+			"userpage.html",
+			user = fl.session["user"],
+			sheets = []
+		)
 	else:
 		return fl.redirect(fl.url_for("login"))
 

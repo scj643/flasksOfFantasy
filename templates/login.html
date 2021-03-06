@@ -1,5 +1,5 @@
 <html>
-	<title>Login</title>
+	<title>FoF: Login</title>
 	<head>
 		<script src = {{url_for("static", filename = "brython/brython.js")}}></script>
 		<script src = {{url_for("static", filename = "brython/brython_stdlib.js")}}></script>
@@ -7,11 +7,11 @@
 	</head>
 	<body onload = "brython()">
 		<script type="text/python" src = {{url_for("static", filename = "login.py")}}></script>
-		<h1>Login:</h1> <br>
+		<h2>Login:</h2> <br>
 		<label for = "user">Username:</label>
-		<input type = "text" id = "user">
+		<input type = "text" id = "user"> <br>
 		<label for = "pass">Password:</label>
-		<input type = "password" id = "pass">
+		<input type = "password" id = "pass"> <br>
 		<input type = "button" id = "login" value = "Login"> <br>
 		<label id = "error"></label>
 	</body>

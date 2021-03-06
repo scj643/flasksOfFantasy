@@ -1,5 +1,5 @@
 <html>
-	<title>{{user}}</title>
+	<title>FoF: {{user}}'s Sheets</title>
 	<head>
 		<script src = {{url_for("static", filename = "brython/brython.js")}}></script>
 		<script src = {{url_for("static", filename = "brython/brython_stdlib.js")}}></script>
@@ -7,7 +7,26 @@
 	</head>
 	<body onload = "brython()">
 		<script type = "text/python" src = {{url_for("static", filename = "logout.py")}}></script>
-		<h1>Welcome to your personal page, {{user}}.</h1>
-		<input type = "button" id = "logout" value = "Logout">
+		<div id = "header">
+			<h1>{{user}}</h1>
+			<input type = "button" id = "newsheet" value = "New Sheet">
+			<input type = "button" id = "settings" value = "Settings">
+			<input type = "button" id = "logout" value = "Logout">
+		</div>
+		<div id = "sheets">
+			<h2>Sheets:</h2> <br>
+			{% if sheets|length == 0 %}
+			<h2>No sheets found. Make a new one by clicking the "New Sheet" button above.</h2> <br>
+			{% else %}
+			{% for sheet in sheets %}
+			<div class = "sheet">
+				<a href = "{{sheet['link']}}">{{sheet['name']}}</a>
+				<input type = "button" id = "save{{sheet['name']}}" value = "Download">
+				<input type = "button" id = "copy{{sheet['name']}}" value = "Duplicate">
+				<input type = "button" id = "del{{sheet['name']}}" value = "Delete">
+			</div> <br>
+			{% endfor %}
+			{% endif %}
+		</div>
 	</body>
 </html>
