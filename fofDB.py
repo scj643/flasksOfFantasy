@@ -89,8 +89,6 @@ def doHash(password : str, salt : str) -> str:
 # Check if an inputted password matches the recorded salted-hash
 def checkPassword(password : str, salt : str, hash : str) -> bool:
 	hashComputed = doHash(password, salt)
-	print(hash)
-	print(hashComputed)
 	return hash == hashComputed
 # Add a new row to the users table without storing the password
 # ONLY USE AFTER VALIDATING THE PASSWORD AS STRONG

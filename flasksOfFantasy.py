@@ -44,12 +44,47 @@ def login():
         else:
             return fl.render_template("login.html")
     elif fl.request.method == "POST":
-        pass
+        if fl.request.is_json:
+            credentials = fl.request.get_json()
+            userData = db.queryRead(
+                "SELECT * FROM USERS WHERE username = :username",
+                credentials
+            )
+
+            if len(userData) == 0:
+                return fl.jsonify({"error": "Bad username."})
+            else:
+                userData = userData[0]
+
+            if db.checkPassword(
+                credentials["password"],
+                userData["salt"], userData["hash"]
+            ):
+                fl.session["user"] = credentials["username"]
+                return fl.jsonify({"url": fl.url_for("userpage"), "error": "None"})
+            else:
+                return fl.jsonify({"error": "Bad password."})
+        else:
+            return fl.jsonify({"error": "No JSON Submitted."})
+
+def logout():
+    del fl.session["user"]
+    return fl.redirect(fl.url_for("login"))
+
+def userpage():
+    if "user" in fl.session:
+        return fl.render_template("userpage.html", user = fl.session["user"])
+    else:
+        return fl.redirect(fl.url_for("login"))
 
 def index():
     return "<h1>Hello World!</h1>"
+
 # App Rule Instanctiation
 base.add_url_rule('/', "index", index)
+base.add_url_rule("/login/", "login", login, methods = ("GET", "POST"))
+base.add_url_rule("/logout/", "logout", logout)
+base.add_url_rule("/user/", "userpage", userpage)
 # App Execution
 if __name__ == "__main__":
     if len(SSL_PATH_TO_CERT) > 0 and len(SSL_PATH_TO_PRIVKEY) > 0:

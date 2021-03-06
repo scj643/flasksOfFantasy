@@ -1,0 +1,13 @@
+<html>
+	<title>{{user}}</title>
+	<head>
+		<script src = {{url_for("static", filename = "brython/brython.js")}}></script>
+		<script src = {{url_for("static", filename = "brython/brython_stdlib.js")}}></script>
+		<meta charset = "utf-8">
+	</head>
+	<body onload = "brython()">
+		<script type = "text/python" src = {{url_for("static", filename = "logout.py")}}></script>
+		<h1>Welcome to your personal page, {{user}}.</h1>
+		<input type = "button" id = "logout" value = "Logout">
+	</body>
+</html>
