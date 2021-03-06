@@ -8,8 +8,10 @@
 	<body onload = "brython()">
 		<script type="text/python" src = {{url_for("static", filename = "login.py")}}></script>
 		<h1>Login:</h1> <br>
+		<label for = "user">Username:</label>
 		<input type = "text" id = "user">
-		<input type = "text" id = "pass">
+		<label for = "pass">Password:</label>
+		<input type = "password" id = "pass">
 		<input type = "button" id = "login" value = "Login"> <br>
 		<label id = "error"></label>
 	</body>
