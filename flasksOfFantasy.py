@@ -86,7 +86,7 @@ def userpage():
 		return fl.render_template(
 			"userpage.html",
 			user = fl.session["user"],
-			sheets = []
+			sheets = testSheets
 		)
 	else:
 		return fl.redirect(fl.url_for("login"))
@@ -99,6 +99,10 @@ base.add_url_rule('/', "index", index)
 base.add_url_rule("/login/", "login", login, methods = ("GET", "POST"))
 base.add_url_rule("/logout/", "logout", logout)
 base.add_url_rule("/user/", "userpage", userpage)
+base.add_url_rule(
+	"/user/<script>", "userScripts",
+	lambda script : fl.redirect("/static/" + script)
+)
 # App Execution
 if __name__ == "__main__":
 	if len(SSL_PATH_TO_CERT) > 0 and len(SSL_PATH_TO_PRIVKEY) > 0:
