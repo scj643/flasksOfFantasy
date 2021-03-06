@@ -16,15 +16,21 @@ if os.path.exists("./config.json"):
         configFile.close()
         SSL_PATH_TO_CERT = configDict["sslPathToCert"]
         SSL_PATH_TO_PRIVKEY = configDict["sslPathToPrivKey"]
+        COOKIE_SECURE = configDict["cookieSecure"]
         HOST = configDict["host"]
     except Exception as e:
         print(e)
         print(NO_CONFIG_MESSAGE)
+        SSL_PATH_TO_CERT = ""
+        SSL_PATH_TO_PRIVKEY = ""
+        COOKIE_SECURE = True
+        HOST = "localhost"
 else:
     print("Could not find 'config.json' in root directory,")
     print(NO_CONFIG_MESSAGE)
     SSL_PATH_TO_CERT = ""
     SSL_PATH_TO_PRIVKEY = ""
+    COOKIE_SECURE = True
     HOST = "localhost"
 # App Creation
 base = fl.Flask(__name__)
@@ -33,7 +39,7 @@ if not os.path.exists("./" + key.KEY_FILE):
 base.secret_key = key.getKey()
 base.config.update(
     SESSION_COOKIE_SAMESITE = "Strict",
-    SESSION_COOKIE_SECURE = True,
+    SESSION_COOKIE_SECURE = COOKIE_SECURE,
     SESSION_COOKIE_HTTPONLY = True
 )
 # App Rule Functions

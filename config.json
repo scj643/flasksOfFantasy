@@ -1,5 +1,6 @@
 {
-    "host": "0.0.0.0",
+    "cookieSecure": false,
+    "host": "localhost",
     "sslPathToCert": "",
     "sslPathToPrivKey": ""
 }
