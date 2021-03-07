@@ -88,9 +88,27 @@ def getSheets(user):
 		{"user": user}
 	)
 	return [
-		{"name": sheet["sheetname"], "link": sheet["path"].split(".json")[0]}
+		{"name": sheet["sheetname"], "link": sheet["path"].split(".json")[0][1:]}
 		for sheet in raw
 	]
+
+def sendSheet(user, sheet):
+	if "user" in fl.session:
+		if user == fl.session["user"]:
+			sheetPath = db.queryRead("""SELECT * FROM SHEETS
+WHERE username = :user AND sheetname = :sheet""",
+				{"user": user, "sheet": sheet}
+			)[0]["path"]
+			print(sheetPath)
+			if os.path.exists(sheetPath):
+				return fl.send_from_directory("./sheets/" + user + '/', sheet + ".json")
+		else:
+			print("File not found: " + sheet)
+			return fl.redirect(fl.url_for("userpage"))
+	else:
+		return fl.redirect(fl.url_for("login"))
+
+	print("End of sendSheet reached, oh no!")
 
 def userpage():
 	if fl.request.method == "GET":
@@ -122,9 +140,12 @@ WHERE username = :user AND sheetname = :newSheetName""",
 						+ "\" already exists. Please retry with a different name."
 					})
 				else:
-					# TODO: Make template JSON
-					userRequest["path"] = "/sheets/" + userRequest["user"] + '/' \
+					userRequest["path"] = "./sheets/" + userRequest["user"] + '/' \
 						+ userRequest["newSheetName"] + ".json"
+
+					newFile = open(userRequest["path"], 'w')
+					json.dump({"hello": "world"}, newFile, indent = 4, sort_keys = True)
+					newFile.close()
 					db.queryWrite(
 						"INSERT INTO SHEETS VALUES (:user, :newSheetName, :path)",
 						userRequest
@@ -151,6 +172,7 @@ base.add_url_rule(
 	"/user/<script>", "userScripts",
 	lambda script : fl.redirect("/static/" + script)
 )
+base.add_url_rule("/sheets/<user>/<sheet>/", "getsheet", sendSheet)
 # App Execution
 if __name__ == "__main__":
 	if len(SSL_PATH_TO_CERT) > 0 and len(SSL_PATH_TO_PRIVKEY) > 0:

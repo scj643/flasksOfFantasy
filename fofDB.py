@@ -81,6 +81,9 @@ AND NAME = :name;""",
 	
 	conn.commit()
 	conn.close()
+
+	if not os.path.exists("./sheets"):
+		os.mkdir("./sheets")
 # Computer a hash h(p || s) for a password p and salt s
 def doHash(password : str, salt : str) -> str:
 	h = sha.new()
@@ -107,4 +110,7 @@ def createUser(username : str, password : str):
 		"INSERT INTO USERS VALUES (:u, :s, :h)",
 		{'u' : username, 's' : salt, 'h' : hash}
 	)
+
+	if not os.path.exists("./sheets/" + username):
+		os.mkdir("./sheets/" + username)
 
