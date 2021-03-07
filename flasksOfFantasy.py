@@ -8,6 +8,11 @@ import fofSTR as strings
 # CONSTANTS
 DEBUG = True
 NO_CONFIG_MESSAGE = "Using default SSL and Host configurations (no https and localhost)"
+testSheets = [
+	{"name": "Foo", "link": "/sheet/foo"},
+	{"name": "Jym", "link": "/sheet/jym"}
+]
+noJSONError = {"error": "No JSON Submitted."}	
 # Configurtion Initialization
 if os.path.exists("./config.json"):
 	try:
@@ -71,25 +76,68 @@ def login():
 			else:
 				return fl.jsonify({"error": "Bad password."})
 		else:
-			return fl.jsonify({"error": "No JSON Submitted."})
+			return fl.jsonify(noJSONError)
 
 def logout():
 	del fl.session["user"]
 	return fl.redirect(fl.url_for("login"))
 
+def getSheets(user):
+	raw = db.queryRead(
+		"SELECT * FROM SHEETS WHERE username = :user",
+		{"user": user}
+	)
+	return [
+		{"name": sheet["sheetname"], "link": sheet["path"].split(".json")[0]}
+		for sheet in raw
+	]
+
 def userpage():
-	testSheets = [
-		{"name": "Foo", "link": "/sheet/foo"},
-		{"name": "Jym", "link": "/sheet/jym"}
-	]		
-	if "user" in fl.session:
-		return fl.render_template(
-			"userpage.html",
-			user = fl.session["user"],
-			sheets = testSheets
-		)
-	else:
-		return fl.redirect(fl.url_for("login"))
+	if fl.request.method == "GET":
+		if "user" in fl.session:
+			return fl.render_template(
+				"userpage.html",
+				user = fl.session["user"],
+				sheets = getSheets(fl.session["user"])
+			)
+		else:
+			return fl.redirect(fl.url_for("login"))
+	elif fl.request.method == "POST":
+		if fl.request.is_json:
+			userRequest = fl.request.get_json()
+			userRequest["user"] = fl.session["user"]
+			if userRequest["method"] == "newSheet":
+				if not strings.isAllowedChars(userRequest["newSheetName"]):
+					return fl.jsonify({
+						"error": "Outlawed characters detected in \"" \
+						+ userRequest["newSheetName"] \
+						+ "\". Please do not use quote marks or the backslash."
+					})
+				elif len(db.queryRead("""SELECT * FROM SHEETS
+WHERE username = :user AND sheetname = :newSheetName""",
+					userRequest
+				)) != 0:
+					return fl.jsonify({
+						"error": "Sheet \"" + userRequest["newSheetName"] \
+						+ "\" already exists. Please retry with a different name."
+					})
+				else:
+					# TODO: Make template JSON
+					userRequest["path"] = "/sheets/" + userRequest["user"] + '/' \
+						+ userRequest["newSheetName"] + ".json"
+					db.queryWrite(
+						"INSERT INTO SHEETS VALUES (:user, :newSheetName, :path)",
+						userRequest
+					)
+					return fl.jsonify({
+						"error": "None.",
+						"url": userRequest["path"],
+						"newSheetName": userRequest["newSheetName"]
+					})
+			else:
+				return fl.jsonify({"error": "Bad POST Request."})
+		else:
+			return fl.jsonify(noJSONError)
 
 def index():
 	return "<h1>Hello World!</h1>"
@@ -98,7 +146,7 @@ def index():
 base.add_url_rule('/', "index", index)
 base.add_url_rule("/login/", "login", login, methods = ("GET", "POST"))
 base.add_url_rule("/logout/", "logout", logout)
-base.add_url_rule("/user/", "userpage", userpage)
+base.add_url_rule("/user/", "userpage", userpage, methods = ("GET", "POST"))
 base.add_url_rule(
 	"/user/<script>", "userScripts",
 	lambda script : fl.redirect("/static/" + script)
