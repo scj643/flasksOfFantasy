@@ -157,6 +157,7 @@ WHERE username = :user AND sheetname = :newSheetName""",
 					})
 			elif userRequest["method"] == "delete":
 				return fl.jsonify({"error": "Placeholder for delete"})
+				db.queryWrite("DELETE FROM SHEETS WHERE sheetname = :sheet", userRequest)
 			else:
 				return fl.jsonify({"error": "Bad POST Request."})
 		else:
