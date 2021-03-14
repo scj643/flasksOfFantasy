@@ -155,6 +155,8 @@ WHERE username = :user AND sheetname = :newSheetName""",
 						"url": userRequest["path"],
 						"newSheetName": userRequest["newSheetName"]
 					})
+			elif userRequest["method"] == "delete":
+				return fl.jsonify({"error": "Placeholder for delete"})
 			else:
 				return fl.jsonify({"error": "Bad POST Request."})
 		else:
