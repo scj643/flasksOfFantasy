@@ -44,7 +44,7 @@ def queryWrite(query : str, params : dict = {}) -> list:
 		response = qd(conn, query, params)
 	except sql.DatabaseError as e:
 		print("SQL Error: " + str(e))
-		return []
+		return [{}]
 	else:
 		conn.commit()
 		conn.close()

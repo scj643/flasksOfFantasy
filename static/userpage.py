@@ -76,6 +76,6 @@ def deleteSheetRequest(event, sheet):
 document["newsheet"].bind("click", newSheetRequest)
 
 for button in document.select(".delete"):
-	#print(button["id"].split('`')[1])
+	print(button["id"].split('`')[1])
 	sheet = button["id"].split('`')[1]
 	button.bind("click", lambda e : deleteSheetRequest(e, sheet))

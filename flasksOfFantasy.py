@@ -1,13 +1,17 @@
 # IMPORTS
 import os
 import json
+import time
 import flask as fl
 import fofDB as db
 import fofKEY as key
 import fofSTR as strings
 # CONSTANTS
 DEBUG = True
-NO_CONFIG_MESSAGE = "Using default SSL and Host configurations (no https and localhost)"
+NO_CONFIG_MESSAGE = "Using default SSL and Host configurations " \
+	+ "(no https and localhost)"
+SQL_WRITE_ERROR = "Failed to write to database.\n" \
+	+ "Contact the administrator for further details."
 testSheets = [
 	{"name": "Foo", "link": "/sheet/foo"},
 	{"name": "Jym", "link": "/sheet/jym"}
@@ -95,15 +99,21 @@ def getSheets(user):
 def sendSheet(user, sheet):
 	if "user" in fl.session:
 		if user == fl.session["user"]:
-			sheetPath = db.queryRead("""SELECT * FROM SHEETS
-WHERE username = :user AND sheetname = :sheet""",
-				{"user": user, "sheet": sheet}
-			)[0]["path"]
-			print(sheetPath)
-			if os.path.exists(sheetPath):
+			try:
+				sheetPath = db.queryRead(
+					"SELECT * FROM SHEETS " \
+					+ "WHERE username = :user " \
+					+ "AND sheetname = :sheet",
+					{"user": user, "sheet": sheet}
+				)[0]["path"]
+				#print(sheetPath)
+				print("\t[" + user + "]: Sending sheet " + sheet)
 				return fl.send_from_directory("./sheets/" + user + '/', sheet + ".json")
+			except IndexError:
+				print("\t[" + user + "]: Sheet \"" + sheet + "\" does not exist")
+				return fl.redirect(fl.url_for("userpage"))
 		else:
-			print("File not found: " + sheet)
+			print("Incorrect user access for " + sheet)
 			return fl.redirect(fl.url_for("userpage"))
 	else:
 		return fl.redirect(fl.url_for("login"))
@@ -131,10 +141,14 @@ def userpage():
 						+ userRequest["newSheetName"] \
 						+ "\". Please do not use quote marks or the backslash."
 					})
-				elif len(db.queryRead("""SELECT * FROM SHEETS
-WHERE username = :user AND sheetname = :newSheetName""",
-					userRequest
-				)) != 0:
+				elif len(
+					db.queryRead(
+						"SELECT * FROM SHEETS " \
+						+ "WHERE username = :user " \
+						+ "AND sheetname = :newSheetName",
+						userRequest
+					)
+				) != 0:
 					return fl.jsonify({
 						"error": "Sheet \"" + userRequest["newSheetName"] \
 						+ "\" already exists. Please retry with a different name."
@@ -143,21 +157,55 @@ WHERE username = :user AND sheetname = :newSheetName""",
 					userRequest["path"] = "./sheets/" + userRequest["user"] + '/' \
 						+ userRequest["newSheetName"] + ".json"
 
-					newFile = open(userRequest["path"], 'w')
-					json.dump({"hello": "world"}, newFile, indent = 4, sort_keys = True)
-					newFile.close()
+					if len(
+						db.queryWrite(
+							"INSERT INTO SHEETS VALUES " \
+							+ "(:user, :newSheetName, :path)",
+							userRequest
+						)
+					) == 0:
+						newFile = open(userRequest["path"], 'w')
+						json.dump({"hello": "world"}, newFile, indent = 4, sort_keys = True)
+						newFile.close()
+
+						return fl.jsonify({
+							"error": "None.",
+							"url": userRequest["path"],
+							"newSheetName": userRequest["newSheetName"]
+						})
+					else:
+						return fl.jsonify({
+							"error": SQL_WRITE_ERROR,
+						})
+
+			elif userRequest["method"] == "delete":
+				if len(
 					db.queryWrite(
-						"INSERT INTO SHEETS VALUES (:user, :newSheetName, :path)",
+						"DELETE FROM SHEETS " \
+						+ "WHERE sheetname = :sheetName",
 						userRequest
+					)
+				) == 0:
+					if not os.path.exists("./recycleBin/"):
+						os.mkdir("./recycleBin/")
+					if not os.path.exists(
+						"./recycleBin/" + userRequest["user"] + '/'
+					):
+						os.mkdir("./recycleBin/" + userRequest["user"] + '/')
+
+					os.rename(
+						"./sheets/" + userRequest["user"] + '/' \
+						+ userRequest["sheetName"] + ".json",
+						"./recycleBin/" + userRequest["user"] + '/' \
+						+ userRequest["sheetName"] + '.' \
+						+ str(time.time_ns()) + ".json"
 					)
 					return fl.jsonify({
 						"error": "None.",
-						"url": userRequest["path"],
-						"newSheetName": userRequest["newSheetName"]
+						"sheetName": userRequest["sheetName"]
 					})
-			elif userRequest["method"] == "delete":
-				return fl.jsonify({"error": "Placeholder for delete"})
-				db.queryWrite("DELETE FROM SHEETS WHERE sheetname = :sheet", userRequest)
+				else:
+					return fl.jsonify({"error": SQL_WRITE_ERROR})
 			else:
 				return fl.jsonify({"error": "Bad POST Request."})
 		else:
