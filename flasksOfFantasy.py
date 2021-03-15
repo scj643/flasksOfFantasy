@@ -7,6 +7,7 @@ import flask as fl
 import fofDB as db
 import fofKEY as key
 import fofSTR as strings
+import defaultSheet as ds
 # CONSTANTS
 DEBUG = True
 NO_CONFIG_MESSAGE = "Using default SSL and Host configurations " \
@@ -168,7 +169,7 @@ def userpage():
 						)
 					) == 0:
 						newFile = open(userRequest["path"], 'w')
-						json.dump({"hello": "world"}, newFile, indent = 4, sort_keys = True)
+						json.dump(ds.defaultSheet, newFile, indent = 4, sort_keys = True)
 						newFile.close()
 
 						return fl.jsonify({
