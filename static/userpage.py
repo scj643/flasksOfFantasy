@@ -1,4 +1,4 @@
-from browser import bind, document, window, html
+from browser import bind, document, window, html, ajax
 import browser.widgets.dialog as dialog
 from common import ajaxPostJSON, ajaxParseJSON
 
@@ -94,12 +94,40 @@ def duplicateSheetRequest(event, sheet):
 		)
 	box.bind("entry", evaluate)
 
+def downloadSheet(response):
+	if response.status == 200:
+		downloadLink = document.createElement('A')
+		downloadLink.attrs["href"] = window.URL.createObjectURL(
+			window.Blob.new(
+				[response.text],
+				{"type": "application/json"}
+			)
+		)
+		downloadLink.attrs["target"] = "_blank"
+
+		document.body.appendChild(downloadLink)
+		downloadLink.click()
+		document.body.removeChild(downloadLink)
+	else:
+		dialogShowHTTPError(response)
+
+
+def downloadSheetRequest(event, sheet):
+	ajax.get(
+		"/sheets/" + document["user"].innerHTML + '/' + sheet,
+		oncomplete = downloadSheet
+	)
+
 document["newsheet"].bind("click", newSheetRequest)
 
 for button in document.select(".delete"):
 #	print(button["id"].split('`')[1])
 	sheet = button["id"].split('`')[1]
 	button.bind("click", lambda e : deleteSheetRequest(e, sheet))
+
+for button in document.select(".download"):
+	sheet = button["id"].split('`')[1]
+	button.bind("click", lambda e : downloadSheetRequest(e, sheet))
 
 for button in document.select(".duplicate"):
 	sheet = button["id"].split('`')[1]

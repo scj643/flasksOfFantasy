@@ -132,7 +132,9 @@ def userpage():
 		else:
 			return fl.redirect(fl.url_for("login"))
 	elif fl.request.method == "POST":
-		if fl.request.is_json:
+		if not "user" in fl.session:
+			return fl.redirect(fl.url_for("login"))
+		elif fl.request.is_json:
 			userRequest = fl.request.get_json()
 			userRequest["user"] = fl.session["user"]
 			if userRequest["method"] == "newSheet":
