@@ -2,6 +2,7 @@
 import os
 import json
 import time
+import shutil
 import flask as fl
 import fofDB as db
 import fofKEY as key
@@ -206,6 +207,47 @@ def userpage():
 					})
 				else:
 					return fl.jsonify({"error": SQL_WRITE_ERROR})
+
+			elif userRequest["method"] == "duplicate":
+				if len(
+					db.queryRead(
+						"SELECT * FROM SHEETS " \
+						+ "WHERE sheetname = :duplicateName",
+						userRequest
+					)
+				) != 0:
+					return fl.jsonify(
+						{
+							"error": "Duplicate name \"" \
+							+ userRequest["duplicateName"] \
+							+ "\" already in use. Please try again."
+						}
+					)
+				else:
+					userRequest["originalPath"] = "./sheets/" + userRequest["user"] \
+						+ '/' + userRequest["sheetName"] + ".json"
+					userRequest["duplicatePath"] = "./sheets/" + userRequest["user"] \
+						+ '/' + userRequest["duplicateName"] + ".json"
+
+				if len(
+					db.queryWrite(
+						"INSERT INTO SHEETS VALUES " \
+						+ "(:user, :duplicateName, :duplicatePath)",
+						userRequest
+					)
+				) != 0:
+					return fl.jsonify({"error": SQL_WRITE_ERROR})
+				else:
+					shutil.copyfile(
+						userRequest["originalPath"],
+						userRequest["duplicatePath"]
+					)
+					return fl.jsonify({
+						"error": "None.",
+						"sheetName": userRequest["sheetName"],
+						"duplicateName": userRequest["duplicateName"]
+					})
+
 			else:
 				return fl.jsonify({"error": "Bad POST Request."})
 		else:
