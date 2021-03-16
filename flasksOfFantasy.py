@@ -98,6 +98,30 @@ def getSheets(user):
 		for sheet in raw
 	]
 
+def loadSheet(user, sheet):
+	if "user" in fl.session:
+		if user == fl.session["user"]:
+			try:
+				if sheet == db.queryRead(
+					"SELECT * FROM SHEETS " \
+					+ "WHERE username = :user " \
+					+ "AND sheetname = :sheet",
+					{"user": user, "sheet": sheet}
+				)[0]["sheetname"]:
+					return fl.render_template(
+						"sheet.html",
+						sheetName = sheet,
+						username = fl.session["user"]
+					)
+				else:
+					return fl.redirect(fl.url_for("userpage"))
+			except IndexError:
+				return fl.redirect(fl.url_for("userpage"))
+		else:
+			return fl.redirect(fl.url_for("userpage"))
+	else:
+		return fl.redirect(fl.url_for("login"))
+
 def sendSheet(user, sheet):
 	if "user" in fl.session:
 		if user == fl.session["user"]:
@@ -120,7 +144,7 @@ def sendSheet(user, sheet):
 	else:
 		return fl.redirect(fl.url_for("login"))
 
-	print("End of sendSheet reached, oh no!")
+	#print("End of sendSheet reached, oh no!")
 
 def userpage():
 	if fl.request.method == "GET":
@@ -268,7 +292,12 @@ base.add_url_rule(
 	"/user/<script>", "userScripts",
 	lambda script : fl.redirect("/static/" + script)
 )
-base.add_url_rule("/sheets/<user>/<sheet>/", "getsheet", sendSheet)
+base.add_url_rule("/sheets/<user>/<sheet>/", "loadsheet", loadSheet)
+base.add_url_rule("/sheets/<user>/<sheet>/get/", "getsheet", sendSheet)
+base.add_url_rule(
+	"/sheets/<user>/<sheet>/<script>", "sheetScripts",
+	lambda user, sheet, script : fl.redirect("/static/" + script)
+)
 # App Execution
 if __name__ == "__main__":
 	if len(SSL_PATH_TO_CERT) > 0 and len(SSL_PATH_TO_PRIVKEY) > 0:

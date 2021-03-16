@@ -1,0 +1,48 @@
+<html>
+	<title>FoF: {{sheetName}}</title>
+	<head>
+		<script src = {{url_for("static", filename = "brython/brython.js")}}></script>
+		<script src = {{url_for("static", filename = "brython/brython_stdlib.js")}}></script>
+		<meta charset = "utf-8">
+		<meta id = "sheetName" content = "{{sheetName}}">
+		<meta id = "foo" content = "bar">
+		<h1 id = "user">{{username}}</h1>
+	</head>
+	<body onload = "brython()">
+		<script type = "text/python" src = {{url_for("static", filename = "sheet.py")}}></script>
+
+		<div id = "border">
+			<div class = "majorGroup" id = "biography">
+				<h2>Biography</h2>
+				<h3>Key Information</h3>
+
+				<label for = "name">Name</label>
+				<input id = "name" readonly></input>
+				<label for = "race">Race</label>
+				<input id = "race" readonly></input>
+				<label for = "class">Class</label>
+				<input id = "class" readonly></input>
+				<label for = "alignment">Alignment</label>
+				<input id = "alignment" readonly></input>
+
+				<div class = "minorGroup">
+					<h3>Cosmetic Information</h3>
+					<label for = "gender">Gender</label>
+					<input id = "gender" readonly></input>
+					<label for = "eyeColor">Eye Color</label>
+					<input id = "eyeColor" readonly></input>
+					<label for = "hairColor">Hair Color</label>
+					<input id = "hairColor" readonly></input>
+
+					<label for = "size">Size</label>
+					<input id = "size" readonly></input>
+					<label for = "height">Height</label>
+					<input id = "height" readonly></input>
+					<label for = "weight">Weight</label>
+					<input id = "weight" readonly></input>
+				</div>
+
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,12 +1,6 @@
 from browser import bind, document, window, html, ajax
 import browser.widgets.dialog as dialog
-from common import ajaxPostJSON, ajaxParseJSON
-
-def dialogShowHTTPError(response):
-	dialog.InfoDialog(
-		"HTTP Error",
-		str(response.status) + ": " + str(response.text)
-	)
+from common import *
 
 def fooHandler(event):
 	box = dialog.EntryDialog("Foobar", "Enter something will ya!")
@@ -112,12 +106,6 @@ def downloadSheet(response):
 		dialogShowHTTPError(response)
 
 
-def downloadSheetRequest(event, sheet):
-	ajax.get(
-		"/sheets/" + document["user"].innerHTML + '/' + sheet,
-		oncomplete = downloadSheet
-	)
-
 document["newsheet"].bind("click", newSheetRequest)
 
 for button in document.select(".delete"):
@@ -127,7 +115,7 @@ for button in document.select(".delete"):
 
 for button in document.select(".download"):
 	sheet = button["id"].split('`')[1]
-	button.bind("click", lambda e : downloadSheetRequest(e, sheet))
+	button.bind("click", lambda e : downloadSheetRequest(e, sheet, downloadSheet))
 
 for button in document.select(".duplicate"):
 	sheet = button["id"].split('`')[1]
