@@ -17,6 +17,22 @@ def dialogShowHTTPError(response):
 		str(response.status) + ": " + str(response.text)
 	)
 
+def sheetReplyGeneric(response, dialogStrings, replyKeys):
+	if response.status == 200:
+		reply = ajaxParseJSON(response)
+		if reply["error"] == "None.":
+			dialog.InfoDialog(
+				dialogStrings["noErrorTitle"],
+				dialogStrings["noErrorBody"].format([
+					reply[key] for key in replyKeys
+				])
+			)
+		else:
+			dialog.InfoDialog(dialogStrings["errorTitle"], reply["error"])
+	else:
+		dialogShowHTTPError(response)
+
+
 def downloadSheetRequest(event, sheet, handler):
 	ajax.get(
 		"/sheets/" + document["user"].innerHTML + '/' + sheet + "/get/",

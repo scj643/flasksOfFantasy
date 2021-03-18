@@ -6,43 +6,55 @@
 		<meta charset = "utf-8">
 		<meta id = "sheetName" content = "{{sheetName}}">
 		<meta id = "foo" content = "bar">
-		<h1 id = "user">{{username}}</h1>
+		<p id = "user" hidden>{{username}}</p>
 	</head>
 	<body onload = "brython()">
 		<script type = "text/python" src = {{url_for("static", filename = "sheet.py")}}></script>
 
 		<div id = "border">
+			<label for = "save">Save Sheet</label>
+			<input type = "button" id = "save" value = "Save">
+
 			<div class = "majorGroup" id = "biography">
 				<h2>Biography</h2>
-				<h3>Key Information</h3>
 
-				<label for = "name">Name</label>
-				<input id = "name" readonly></input>
-				<label for = "race">Race</label>
-				<input id = "race" readonly></input>
-				<label for = "class">Class</label>
-				<input id = "class" readonly></input>
-				<label for = "alignment">Alignment</label>
-				<input id = "alignment" readonly></input>
+				<label for = "biographyEdit">Edit Biography</label>
+				<input id = "biographyEdit" type = "checkbox">
 
-				<div class = "minorGroup">
-					<h3>Cosmetic Information</h3>
-					<label for = "gender">Gender</label>
-					<input id = "gender" readonly></input>
-					<label for = "eyeColor">Eye Color</label>
-					<input id = "eyeColor" readonly></input>
-					<label for = "hairColor">Hair Color</label>
-					<input id = "hairColor" readonly></input>
+				<div id = "biographyKey" class = "minorGroup">
+					<h3>Key Information</h3>
 
-					<label for = "size">Size</label>
-					<input id = "size" readonly></input>
-					<label for = "height">Height</label>
-					<input id = "height" readonly></input>
-					<label for = "weight">Weight</label>
-					<input id = "weight" readonly></input>
+					<label for = "name">Name</label>
+					<input id = "name" class = "bio" readonly>
+					<label for = "race">Race</label>
+					<input id = "race" class = "bio" readonly>
+
+					<label for = "class">Class</label>
+					<input id = "class" class = "bio" readonly>
+					<label for = "alignment">Alignment</label>
+					<input id = "alignment" class = "bio" readonly>
 				</div>
 
+				<div id = "biographyCosmetic" class = "minorGroup">
+					<h3>Cosmetic Information</h3>
+
+					<label for = "gender">Gender</label>
+					<input id = "gender" class = "bio" readonly>
+					<label for = "eyeColor">Eye Color</label>
+					<input id = "eyeColor" class = "bio" readonly>
+					<label for = "hairColor">Hair Color</label>
+					<input id = "hairColor" class = "bio" readonly>
+
+					<label for = "size">Size</label>
+					<input id = "size" class = "bio" readonly>
+					<label for = "height">Height</label>
+					<input id = "height" class = "bio" readonly>
+					<label for = "weight">Weight</label>
+					<input id = "weight" class = "bio" readonly>
+				</div>
 			</div>
+
+
 		</div>
 	</body>
 </html>

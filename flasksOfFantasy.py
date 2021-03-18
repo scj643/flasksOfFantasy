@@ -18,7 +18,11 @@ testSheets = [
 	{"name": "Foo", "link": "/sheet/foo"},
 	{"name": "Jym", "link": "/sheet/jym"}
 ]
-noJSONError = {"error": "No JSON Submitted."}	
+noJSONError = {"error": "No JSON Submitted."}
+# Header Control Functions (use with fl.after_this_request in rule functions)
+def noCaching(response):
+	response.headers["Cache-Control"] = "no-cache"
+	return response
 # Configurtion Initialization
 if os.path.exists("./config.json"):
 	try:
@@ -98,16 +102,21 @@ def getSheets(user):
 		for sheet in raw
 	]
 
+sheetQuery = "SELECT * FROM SHEETS WHERE username = :user AND sheetname = :sheet"
+
+checkDBForSheet = lambda user, sheet : sheet == db.queryRead(
+	sheetQuery,	{"user": user, "sheet": sheet}
+)[0]["sheetname"]
+
+getSheetPath = lambda user, sheet : db.queryRead(
+	sheetQuery, {"user": user, "sheet": sheet}
+)[0]["path"]
+
 def loadSheet(user, sheet):
 	if "user" in fl.session:
 		if user == fl.session["user"]:
 			try:
-				if sheet == db.queryRead(
-					"SELECT * FROM SHEETS " \
-					+ "WHERE username = :user " \
-					+ "AND sheetname = :sheet",
-					{"user": user, "sheet": sheet}
-				)[0]["sheetname"]:
+				if checkDBForSheet(user, sheet):
 					return fl.render_template(
 						"sheet.html",
 						sheetName = sheet,
@@ -122,7 +131,49 @@ def loadSheet(user, sheet):
 	else:
 		return fl.redirect(fl.url_for("login"))
 
+def saveSheet(user, sheet):
+	if "user" in fl.session:
+		if user == fl.session["user"]:
+			if not fl.request.is_json:
+				return fl.jsonify({"error": "Bad POST Request."})
+			else:
+				sheetData = fl.request.get_json()
+				sheetPath = getSheetPath(user, sheet)
+				print(sheetPath)
+
+			try:
+				if checkDBForSheet(user, sheet):
+					try:
+						sheetFile = open(sheetPath, 'w')
+						json.dump(
+							sheetData, sheetFile,
+							indent = 4, sort_keys = True
+						)
+						sheetFile.close()
+						return fl.jsonify({
+							"error": "None."
+						})
+					
+					except OSError as e:
+						return fl.jsonify({"error": "OS Error: " + e})
+				else:
+					return fl.jsonify({
+						"error": "Sheet not found." \
+						+ "You shouldn't be seeing this error..."
+					})
+			except IndexError:
+				return fl.jsonify({
+					"error": "Sheet doesn't exist. " \
+					+ "You shouldn't be seeing this error..."
+				})
+		else:
+			return fl.jsonify({"error": "Improper Access."})
+	else:
+		return fl.jsonify({"error": "Can I see your passport?"})
+
+
 def sendSheet(user, sheet):
+	fl.after_this_request(noCaching)
 	if "user" in fl.session:
 		if user == fl.session["user"]:
 			try:
@@ -294,6 +345,13 @@ base.add_url_rule(
 )
 base.add_url_rule("/sheets/<user>/<sheet>/", "loadsheet", loadSheet)
 base.add_url_rule("/sheets/<user>/<sheet>/get/", "getsheet", sendSheet)
+base.add_url_rule(
+	"/sheets/<user>/<sheet>/save/",
+	"saveSheet",
+	saveSheet,
+#	lambda user, sheet : fl.jsonify({"error": "TODO"}),
+	methods = ["POST"]
+)
 base.add_url_rule(
 	"/sheets/<user>/<sheet>/<script>", "sheetScripts",
 	lambda user, sheet, script : fl.redirect("/static/" + script)
