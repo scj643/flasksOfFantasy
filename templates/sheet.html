@@ -56,14 +56,79 @@
 
 			<div id = "abilities" class = "majorGroup">
 				<h2>Ability Scores</h2>
+				{% for ability in abilities %}
 				<div class = "minorGroup">
-					<label for = "strength"><h3>Strength</h3></label>
-					<input id = "strength" class = "ability" readonly>
-					<label for = "strengthBonus">Bonus</label>
-					<input id = "strengthBonus" class = "abilityBonus" readonly>
+					<label for = "{{ability}}"><h3>{{ability|capitalize}}</h3></label>
+					<input id = "{{ability}}" class = "ability" readonly>
+					<label for = "{{ability}}Bonus">Bonus</label>
+					<input id = "{{ability}}Bonus" class = "abilityBonus" readonly>
 				</div>
+
+				{% endfor %}
 			</div>
 
+			<div id = "statistics" class = "majorGroup">
+				<h2>Statistics</h2>
+				<div class = "minorGroup">
+					<h3>Hit Points</h3>
+					<label for = "currentHit">Current Hit Points</label>
+					<input id = "currentHit" class = "hit" readonly>
+
+					<label for = "maxHit">Maximum Hit Points</label>
+					<input id = "maxHit" class = "hit" readonly>
+
+					<div id = "hitDice">
+						<h4>Hit Dice</h4>
+					</div>
+
+					<div id = "deathSaves">
+						<h4>Death Saves</h4>
+						<label for = "successes">Successes</label>
+						<div id = "successes">
+							{% for count in range(1, 4) %}
+							<input id = "success{{count}}" type = "checkbox">
+							{% endfor %}
+						</div>
+
+						<label for = "failures">Failures</label>
+						<div id = "failures">
+							{% for count in range(1, 4) %}
+							<input id = "failure{{count}}" type = "checkbox">
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+
+				<div class = "minorGroup">
+					<h3>Experience</h3>
+					<label for = "characterLevel"><h4>Character Level</h4></label>
+					<input id = "characterLevel" class = "experience" readonly>
+
+					<div id = "classLevels">
+						<h4>Class Level(s)</h4>
+					</div>
+
+					<label for = "currentExperience">Experience Points</label>
+					<input id = "currentExperience" class = "experience" readonly>
+					
+					<label for = "nextExperience">Needed for Next Level</label>
+					<input id = "nextExperience" class = "experience" readonly>
+				</div>
+
+				<div class = "minorGroup">
+					<label for = "armorClass"><h3>Armor Class</h3></label>
+					<input id = "armorClass" readonly>
+				</div>
+
+				<div class = "minorGroup">
+					<h3>Currency</h3>
+					{% for coin in coins %}
+					<label for = "{{coin}}">{{coin|capitalize}}</label>
+					<input id = "{{coin}}" class = "currency" readonly>
+
+					{% endfor %}
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

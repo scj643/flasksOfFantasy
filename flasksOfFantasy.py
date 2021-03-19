@@ -129,7 +129,12 @@ def loadSheet(user, sheet):
 					return fl.render_template(
 						"sheet.html",
 						sheetName = sheet,
-						username = fl.session["user"]
+						username = fl.session["user"],
+						abilities = (
+							"strength", "dexterity", "constitution",
+							"intelligence", "wisdom", "charisma"
+						),
+						coins = ("gold", "silver", "copper")
 					)
 				else:
 					return fl.redirect(fl.url_for("userpage"))
