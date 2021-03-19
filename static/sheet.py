@@ -65,4 +65,4 @@ document["save"].bind("click", saveSheet)
 
 #print(document["sheetName"])
 
-downloadSheetRequest(None, sheetName, jsonHandler)
+downloadSheetRequest(PseudoEvent(" `" + sheetName), jsonHandler)

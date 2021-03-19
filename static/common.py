@@ -2,6 +2,10 @@ from browser import document, ajax
 import browser.widgets.dialog as dialog
 import json
 
+class PseudoEvent:
+	def __init__(self, id):
+		self.target = {"id": id}
+
 def ajaxPostJSON(target : str, payload : dict, complete):
 	ajax.post(
 		target, headers = {"Content-Type": "application/json"},
@@ -33,7 +37,9 @@ def sheetReplyGeneric(response, dialogStrings, replyKeys):
 		dialogShowHTTPError(response)
 
 
-def downloadSheetRequest(event, sheet, handler):
+def downloadSheetRequest(event, handler):
+	print(event.target)
+	sheet = event.target["id"].split('`')[1]
 	ajax.get(
 		"/sheets/" + document["user"].innerHTML + '/' + sheet + "/get/",
 		oncomplete = handler

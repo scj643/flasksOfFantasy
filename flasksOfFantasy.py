@@ -92,6 +92,15 @@ def logout():
 	del fl.session["user"]
 	return fl.redirect(fl.url_for("login"))
 
+def staticCahcingCheck(script):
+	noCacheList = ["common.py"]
+	print(script)
+	if script in noCacheList:
+		fl.after_this_request(noCaching)
+		return fl.send_from_directory("./static/", script)
+	else:
+		fl.redirect("/static/" + script)
+
 def getSheets(user):
 	raw = db.queryRead(
 		"SELECT * FROM SHEETS WHERE username = :user",
@@ -339,22 +348,16 @@ base.add_url_rule('/', "index", index)
 base.add_url_rule("/login/", "login", login, methods = ("GET", "POST"))
 base.add_url_rule("/logout/", "logout", logout)
 base.add_url_rule("/user/", "userpage", userpage, methods = ("GET", "POST"))
-base.add_url_rule(
-	"/user/<script>", "userScripts",
-	lambda script : fl.redirect("/static/" + script)
-)
+base.add_url_rule("/user/<script>", "userScripts", staticCahcingCheck)
 base.add_url_rule("/sheets/<user>/<sheet>/", "loadsheet", loadSheet)
 base.add_url_rule("/sheets/<user>/<sheet>/get/", "getsheet", sendSheet)
 base.add_url_rule(
 	"/sheets/<user>/<sheet>/save/",
-	"saveSheet",
-	saveSheet,
-#	lambda user, sheet : fl.jsonify({"error": "TODO"}),
-	methods = ["POST"]
+	"saveSheet", saveSheet, methods = ["POST"]
 )
 base.add_url_rule(
 	"/sheets/<user>/<sheet>/<script>", "sheetScripts",
-	lambda user, sheet, script : fl.redirect("/static/" + script)
+	lambda user, sheet, script : staticCahcingCheck(script)
 )
 # App Execution
 if __name__ == "__main__":

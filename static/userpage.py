@@ -30,7 +30,8 @@ def newSheetRequest(event):
 		)
 	box.bind("entry", evaluate)
 
-def deleteSheetRequest(event, sheet):
+def deleteSheetRequest(event):
+	sheet = event.target["id"].split('`')[1]
 	box = dialog.Dialog("Confirm Deletion", ok_cancel = ("Delete", "Cancel"))
 	box.panel <= html.P(
 		"Are you sure you want to delete sheet \"" \
@@ -54,7 +55,8 @@ def deleteSheetRequest(event, sheet):
 		)
 	box.ok_button.bind("click", delete)
 
-def duplicateSheetRequest(event, sheet):
+def duplicateSheetRequest(event):
+	sheet = event.target["id"].split('`')[1]
 	box = dialog.EntryDialog("Duplicate Sheet", "Enter a name for the duplicate")
 	def evaluate(entryEvent):
 		duplicateName = box.value
@@ -94,14 +96,11 @@ def downloadSheet(response):
 document["newsheet"].bind("click", newSheetRequest)
 
 for button in document.select(".delete"):
-#	print(button["id"].split('`')[1])
-	sheet = button["id"].split('`')[1]
-	button.bind("click", lambda e : deleteSheetRequest(e, sheet))
+	button.bind("click", deleteSheetRequest)
 
 for button in document.select(".download"):
-	sheet = button["id"].split('`')[1]
-	button.bind("click", lambda e : downloadSheetRequest(e, sheet, downloadSheet))
+	button.bind("click", lambda e : downloadSheetRequest(e, downloadSheet))
 
 for button in document.select(".duplicate"):
 	sheet = button["id"].split('`')[1]
-	button.bind("click", lambda e : duplicateSheetRequest(e, sheet))
+	button.bind("click", duplicateSheetRequest)
