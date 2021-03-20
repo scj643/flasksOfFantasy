@@ -38,7 +38,7 @@ def sheetReplyGeneric(response, dialogStrings, replyKeys):
 
 
 def downloadSheetRequest(event, handler):
-	print(event.target)
+	#print(event.target)
 	sheet = event.target["id"].split('`')[1]
 	ajax.get(
 		"/sheets/" + document["user"].innerHTML + '/' + sheet + "/get/",

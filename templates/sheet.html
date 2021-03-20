@@ -56,10 +56,15 @@
 
 			<div id = "abilities" class = "majorGroup">
 				<h2>Ability Scores</h2>
+				<label for = "abilitiesEdit">Edit Ability Scores</label>
+				<input id = "abilitiesEdit" type = "checkbox">
 				{% for ability in abilities %}
 				<div class = "minorGroup">
 					<label for = "{{ability}}"><h3>{{ability|capitalize}}</h3></label>
+					<input id = "{{ability}}`Set" class = "abilityButton" type = "button" value = "Set" disabled>
+					<input id = "{{ability}}`Decrement" class = "abilityButton" type = "button" value = "-" disabled>
 					<input id = "{{ability}}" class = "ability" readonly>
+					<input id = "{{ability}}`Increment" class = "abilityButton" type = "button" value = "+" disabled>
 					<label for = "{{ability}}Bonus">Bonus</label>
 					<input id = "{{ability}}Bonus" class = "abilityBonus" readonly>
 				</div>
@@ -69,7 +74,7 @@
 
 			<div id = "statistics" class = "majorGroup">
 				<h2>Statistics</h2>
-				<div class = "minorGroup">
+				<div id = "hit" class = "minorGroup">
 					<h3>Hit Points</h3>
 					<label for = "currentHit">Current Hit Points</label>
 					<input id = "currentHit" class = "hit" readonly>
@@ -99,7 +104,7 @@
 					</div>
 				</div>
 
-				<div class = "minorGroup">
+				<div id = "exeperience" class = "minorGroup">
 					<h3>Experience</h3>
 					<label for = "characterLevel"><h4>Character Level</h4></label>
 					<input id = "characterLevel" class = "experience" readonly>
