@@ -76,11 +76,17 @@
 				<h2>Statistics</h2>
 				<div id = "hit" class = "minorGroup">
 					<h3>Hit Points</h3>
+					<label for = "hitEdit">Edit Hit Points</label>
+					<input id = "hitEdit" type = "checkbox">
 					<label for = "currentHit">Current Hit Points</label>
+					<input id = "currentHit`Set" class = "hitButton" type = "button" value = "Set" disabled>
+					<input id = "currentHit`Decrement" class = "hitButton" type = "button" value = "-" disabled>
 					<input id = "currentHit" class = "hit" readonly>
+					<input id = "currentHit`Increment" class = "hitButton" type = "button" value = "+" disabled>
 
 					<label for = "maxHit">Maximum Hit Points</label>
 					<input id = "maxHit" class = "hit" readonly>
+					<input id = "maxHit`Set" class = "hitButton" type = "button" value = "Set" disabled>
 
 					<div id = "hitDice">
 						<h4>Hit Dice</h4>
@@ -91,14 +97,14 @@
 						<label for = "successes">Successes</label>
 						<div id = "successes">
 							{% for count in range(1, 4) %}
-							<input id = "success{{count}}" type = "checkbox">
+							<input id = "success`{{count}}" class = "deathSaveCheckbox" type = "checkbox" disabled>
 							{% endfor %}
 						</div>
 
 						<label for = "failures">Failures</label>
 						<div id = "failures">
 							{% for count in range(1, 4) %}
-							<input id = "failure{{count}}" type = "checkbox">
+							<input id = "failure`{{count}}" class = "deathSaveCheckbox" type = "checkbox" disabled>
 							{% endfor %}
 						</div>
 					</div>
