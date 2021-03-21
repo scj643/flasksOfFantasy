@@ -85,6 +85,7 @@ def downloadSheet(response):
 			)
 		)
 		downloadLink.attrs["target"] = "_blank"
+		downloadLink.attrs["download"] = "characterSheet.json"
 
 		document.body.appendChild(downloadLink)
 		downloadLink.click()

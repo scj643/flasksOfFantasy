@@ -1,4 +1,4 @@
-from browser import document
+from browser import document, html
 import browser.widgets.dialog as dialog
 from common import *
 import json
@@ -7,6 +7,29 @@ data = {}
 sheetName = document["sheetName"]["content"]
 
 bioCompoundFields = ("class", "height", "weight")
+coins = ("gold", "silver", "copper")
+levelsAndEXP = {
+	1: 0,
+	2: 300,
+	3: 900,
+	4: 2700,
+	5: 6500,
+	6: 14000,
+	7: 23000,
+	8: 34000,
+	9: 48000,
+	10: 64000,
+	11: 85000,
+	12: 100000,
+	13: 120000,
+	14: 140000,
+	15: 165000,
+	16: 195000,
+	17: 225000,
+	18: 265000,
+	19: 305000,
+	20: 355000
+}
 
 def toggleEditing(event, group):
 	for field in document.select("input." + group):
@@ -112,6 +135,21 @@ def makeDieString(count : int, die : int) -> str:
 
 def makeDiceString(dieDictionaries : list) -> str:
 	return " + ".join([makeDieString(die["count"], die["die"]) for die in dieDictionaries])
+
+def updateHitDiceDivs():
+	for div in document.select("div.hitDiceDiv"):
+		del document[div.id]
+	for k in data["hit"]["dice"].keys():
+		inputID = k + "`HitDice"
+		div = html.DIV(id = inputID + "Div", Class = "hitDiceDiv")
+		div <= html.LABEL(k.capitalize(), For = inputID)
+		div <= html.INPUT(
+			id = inputID, value = makeDieString(
+				data["hit"]["dice"][k]["count"],
+				data["hit"]["dice"][k]["die"]
+			), readonly = ''
+		)
+		document["hitDice"] <= div
 
 def toggleHitAdjustment(event):
 	for button in document.select(".hitButton"):
@@ -225,6 +263,24 @@ def processDeathSaves(event):
 for box in document.select(".deathSaveCheckbox"):
 	box.bind("change", processDeathSaves)
 
+def determineLevel():
+	level = 1
+	while data["experience"]["total"] >= levelsAndEXP[level]:
+		level += 1
+	return level
+
+def updateClassLevelDivs():
+	for k in data["experience"]["level"]["classes"].keys():
+		inputID = k + "`ClassLevel"
+		div = html.DIV(id = inputID + "Div", Class = "classLevelDiv")
+		div <= html.LABEL(k.capitalize(), For = inputID)
+		div <= html.INPUT(
+			id = inputID,
+			value = data["experience"]["level"]["classes"][k],
+			readonly = ''
+		)
+		document["classLevels"] <= div
+
 def reloadValues():
 	global data
 	for k in data["biography"].keys():
@@ -249,6 +305,8 @@ def reloadValues():
 	document["currentHit"].value = data["hit"]["current"]
 	document["maxHit"].value = data["hit"]["max"]
 
+	updateHitDiceDivs()
+
 	try:
 		del document["success`1"].attrs["disabled"]
 	except KeyError:
@@ -271,6 +329,16 @@ def reloadValues():
 		if box < 3:
 			del document["failure`" + str(box + 1)].attrs["disabled"]
 
+	document["characterLevel"].value = data["experience"]["level"]["character"]
+	document["currentExperience"].value = data["experience"]["total"]
+	document["nextExperience"].value = data["experience"]["next"]
+	updateClassLevelDivs()
+
+	document["armorClass"].value = data["armorClass"]
+
+	for coin in coins:
+		document[coin].value = data["currency"][coin]
+
 def jsonHandler(response):
 	global data
 	if response.status == 200:
@@ -284,8 +352,8 @@ def saveSheet(event):
 		"save/", data,
 		lambda r : sheetReplyGeneric(
 			r, {
-				"noErrorTitle": "foo",
-				"noErrorBody": "bar",
+				"noErrorTitle": "Sheet Saved",
+				"noErrorBody": "Your sheet was saved successfully.",
 				"errorTitle": "E R R O R"
 			},
 			()
