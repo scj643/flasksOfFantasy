@@ -270,6 +270,8 @@ def determineLevel():
 	return level
 
 def updateClassLevelDivs():
+	for div in document.select("div.classLevelDiv"):
+		del document[div.id]
 	for k in data["experience"]["level"]["classes"].keys():
 		inputID = k + "`ClassLevel"
 		div = html.DIV(id = inputID + "Div", Class = "classLevelDiv")
@@ -280,6 +282,33 @@ def updateClassLevelDivs():
 			readonly = ''
 		)
 		document["classLevels"] <= div
+
+def updateFeaturesTable():
+	for row in document.select("tr.featureRow"):
+		del document[row.id]
+	for k in data["features"]:
+		inputID = k + "`Feature"
+		row = html.TR(id = inputID + "`Row", Class = "featureRow")
+		row <= html.TD(k)
+		row <= html.TD(data["features"][k]["description"])
+		numericCell = html.TD()
+		if data["features"][k]["type"] == "numeric":
+			numericCell <= html.INPUT(
+				id = inputID + "`Decrement",
+				type = "button", value = "-"
+			)
+			numericCell <= html.INPUT(
+				id = inputID + "`Value",
+				value = data["features"][k]["value"], readonly = ''
+			)
+			numericCell <= html.INPUT(
+				id = inputID + "`Increment",
+				type = "button", value = "+"
+			)
+
+		row <= numericCell
+		row <= html.INPUT(id = inputID + "`Edit", type = "button", value = "Edit")
+		document["features"] <= row
 
 def reloadValues():
 	global data
@@ -338,6 +367,8 @@ def reloadValues():
 
 	for coin in coins:
 		document[coin].value = data["currency"][coin]
+
+	updateFeaturesTable()
 
 def jsonHandler(response):
 	global data
