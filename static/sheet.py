@@ -1,6 +1,7 @@
 from browser import document, html
 import browser.widgets.dialog as dialog
 from common import *
+from sheetDialog import *
 import json
 
 data = {}
@@ -283,6 +284,14 @@ def updateClassLevelDivs():
 		)
 		document["classLevels"] <= div
 
+def adjustFeature(event):
+	feature = event.target.id.split('`')[0]
+	method = event.target.id.split('`')[2]
+
+	if method == "Edit":
+		editFeatDialog = featureEdit(feature)
+	
+
 def updateFeaturesTable():
 	for row in document.select("tr.featureRow"):
 		del document[row.id]
@@ -307,7 +316,9 @@ def updateFeaturesTable():
 			)
 
 		row <= numericCell
-		row <= html.INPUT(id = inputID + "`Edit", type = "button", value = "Edit")
+		featEditButton = html.INPUT(id = inputID + "`Edit", type = "button", value = "Edit")
+		featEditButton.bind("click", adjustFeature)
+		row <= featEditButton
 		document["features"] <= row
 
 def reloadValues():
