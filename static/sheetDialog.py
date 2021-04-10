@@ -23,3 +23,12 @@ def featureEdit(feature) -> dialog.Dialog:
 	d.panel <= html.INPUT(id = "value", readonly = '')
 
 	return d
+
+def featureDelete(feature) -> dialog.Dialog:
+	d = dialog.Dialog("Confirm Deletion", ok_cancel = ("Yes", "No"))
+
+	d.panel <= html.B(
+		"Are you sure you want to delete the \"" + feature + "\" feature?"
+	)
+	
+	return d

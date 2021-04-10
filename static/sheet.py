@@ -287,6 +287,11 @@ def updateClassLevelDivs():
 def adjustFeature(event):
 	feature = event.target.id.split('`')[0]
 	method = event.target.id.split('`')[2]
+	creatingFeature = False
+
+	if method == "New":
+		creatingFeature = True
+		method = "Edit"
 
 	if method in ("Decrement", "Increment"):
 		if method == "Decrement":
@@ -296,20 +301,31 @@ def adjustFeature(event):
 		
 		data["features"][feature]["value"] += changeValue
 		document[feature + "`Feature`Value"].value = data["features"][feature]["value"]
+
+	elif method == "Delete":
+		deleteFeatDialog = featureDelete(feature)
+
+		def deleteHandler(event):
+			del data["features"][feature]
+			deleteFeatDialog.close()
+			updateFeaturesTable()
+
+		deleteFeatDialog.ok_button.bind("click", deleteHandler)
 		
 	elif method == "Edit":
 		editFeatDialog = featureEdit(feature)
-		editFeatDialog.select("#name")[0].value = feature
-		editFeatDialog.select(
-			"#description"
-		)[0].value = data["features"][feature]["description"]
-
-		if data["features"][feature]["type"] == "numeric":
-			editFeatDialog.select("#numericCheck")[0].checked = True
-			del editFeatDialog.select("#value")[0].attrs["readonly"]
+		if not creatingFeature:
+			editFeatDialog.select("#name")[0].value = feature
 			editFeatDialog.select(
-				"#value"
-			)[0].value = data["features"][feature]["value"]
+				"#description"
+			)[0].value = data["features"][feature]["description"]
+
+			if data["features"][feature]["type"] == "numeric":
+				editFeatDialog.select("#numericCheck")[0].checked = True
+				del editFeatDialog.select("#value")[0].attrs["readonly"]
+				editFeatDialog.select(
+					"#value"
+				)[0].value = data["features"][feature]["value"]
 
 		def okHandler(event):
 			newFeatureName = editFeatDialog.select("#name")[0].value
@@ -349,13 +365,14 @@ def adjustFeature(event):
 				}
 
 			data["features"][newFeatureName] = newFeature
-			if newFeatureName != feature:
+			if newFeatureName != feature and not creatingFeature:
 				del data["features"][feature]
 			editFeatDialog.close()
 			updateFeaturesTable()
 
 		editFeatDialog.ok_button.bind("click", okHandler)
-	
+
+document["Create Feature``New"].bind("click", adjustFeature)
 
 def updateFeaturesTable():
 	for row in document.select("tr.featureRow"):
@@ -365,10 +382,11 @@ def updateFeaturesTable():
 		row = html.TR(id = inputID + "`Row", Class = "featureRow")
 		row <= html.TD(k)
 		row <= html.TD(data["features"][k]["description"])
+
 		numericCell = html.TD()
 		if data["features"][k]["type"] == "numeric":
 			decrementButton = html.INPUT(
-				id = inputID + "`Decrement",
+				id = inputID + "`Decrement", Class = "featureButton",
 				type = "button", value = "-"
 			)
 			decrementButton.bind("click", adjustFeature)
@@ -380,16 +398,31 @@ def updateFeaturesTable():
 			)
 
 			incrementButton = html.INPUT(
-				id = inputID + "`Increment",
+				id = inputID + "`Increment", Class = "featureButton",
 				type = "button", value = "+"
 			)
 			incrementButton.bind("click", adjustFeature)
 			numericCell <= incrementButton
 
 		row <= numericCell
-		featEditButton = html.INPUT(id = inputID + "`Edit", type = "button", value = "Edit")
+
+		featSettings = html.TD()
+
+		featEditButton = html.INPUT(
+			id = inputID + "`Edit", Class = "featureButton",
+			type = "button", value = "Edit"
+		)
 		featEditButton.bind("click", adjustFeature)
-		row <= featEditButton
+		featSettings <= featEditButton
+		featDeleteButton = html.INPUT(
+			id = inputID + "`Delete", Class = "featureButton",
+			type = "button", value = "Delete"
+		)
+		featDeleteButton.bind("click", adjustFeature)
+		featSettings <= featDeleteButton
+
+		row <= featSettings
+
 		document["features"] <= row
 
 def reloadValues():
