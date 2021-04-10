@@ -288,32 +288,103 @@ def adjustFeature(event):
 	feature = event.target.id.split('`')[0]
 	method = event.target.id.split('`')[2]
 
-	if method == "Edit":
+	if method in ("Decrement", "Increment"):
+		if method == "Decrement":
+			changeValue = -1
+		elif method == "Increment":
+			changeValue = 1
+		
+		data["features"][feature]["value"] += changeValue
+		document[feature + "`Feature`Value"].value = data["features"][feature]["value"]
+		
+	elif method == "Edit":
 		editFeatDialog = featureEdit(feature)
+		editFeatDialog.select("#name")[0].value = feature
+		editFeatDialog.select(
+			"#description"
+		)[0].value = data["features"][feature]["description"]
+
+		if data["features"][feature]["type"] == "numeric":
+			editFeatDialog.select("#numericCheck")[0].checked = True
+			del editFeatDialog.select("#value")[0].attrs["readonly"]
+			editFeatDialog.select(
+				"#value"
+			)[0].value = data["features"][feature]["value"]
+
+		def okHandler(event):
+			newFeatureName = editFeatDialog.select("#name")[0].value
+			if newFeatureName != feature \
+				and newFeatureName in data["features"].keys():
+				dialog.InfoDialog(
+					"Name Error",
+					"A feature already exists with that name, please choose another one."
+				)
+				return
+			#print("Everything checks out.")
+
+			newFeatureDescription = editFeatDialog.select(
+				"#description"
+			)[0].value
+			newFeatureType = editFeatDialog.select("#numericCheck")[0].checked
+			if newFeatureType:
+				newFeatureValue = editFeatDialog.select("#value")[0].value
+				try:
+					newFeatureValue = int(newFeatureValue)
+				except ValueError:
+					dialog.InfoDialog(
+						"Value Error",
+						"The feature's value must be an integer number. Please correct it."
+					)
+					return
+
+				newFeature = {
+					"description": newFeatureDescription,
+					"type": "numeric",
+					"value": newFeatureValue
+				}
+			else:
+				newFeature = {
+					"description": newFeatureDescription,
+					"type": "written"
+				}
+
+			data["features"][newFeatureName] = newFeature
+			if newFeatureName != feature:
+				del data["features"][feature]
+			editFeatDialog.close()
+			updateFeaturesTable()
+
+		editFeatDialog.ok_button.bind("click", okHandler)
 	
 
 def updateFeaturesTable():
 	for row in document.select("tr.featureRow"):
 		del document[row.id]
-	for k in data["features"]:
+	for k in sorted(data["features"].keys()):
 		inputID = k + "`Feature"
 		row = html.TR(id = inputID + "`Row", Class = "featureRow")
 		row <= html.TD(k)
 		row <= html.TD(data["features"][k]["description"])
 		numericCell = html.TD()
 		if data["features"][k]["type"] == "numeric":
-			numericCell <= html.INPUT(
+			decrementButton = html.INPUT(
 				id = inputID + "`Decrement",
 				type = "button", value = "-"
 			)
+			decrementButton.bind("click", adjustFeature)
+			numericCell <= decrementButton
+
 			numericCell <= html.INPUT(
 				id = inputID + "`Value",
 				value = data["features"][k]["value"], readonly = ''
 			)
-			numericCell <= html.INPUT(
+
+			incrementButton = html.INPUT(
 				id = inputID + "`Increment",
 				type = "button", value = "+"
 			)
+			incrementButton.bind("click", adjustFeature)
+			numericCell <= incrementButton
 
 		row <= numericCell
 		featEditButton = html.INPUT(id = inputID + "`Edit", type = "button", value = "Edit")
