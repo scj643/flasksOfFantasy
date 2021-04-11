@@ -1,4 +1,4 @@
-from browser import document, html
+from browser import document, html, window
 import browser.widgets.dialog as dialog
 from common import *
 from sheetDialog import *
@@ -37,6 +37,17 @@ def toggleEditing(event, group):
 		#print(field)
 		if group == "bio" and field.attrs["id"] in bioCompoundFields:
 			continue
+		elif group == "ac":
+			if event.target.checked:
+				document["armorClass`ShowBase"].checked = True
+				document["armorClass`ShowBase"].attrs["disabled"] = ''
+			else:
+				del document["armorClass`ShowBase"].attrs["disabled"]
+
+			#print("in toggleEditing, firing input event to Show Base AC checkbox...")
+			document["armorClass`ShowBase"].dispatchEvent(
+				window.Event.new("change")
+			)
 		if event.target.checked:
 			del field.attrs["readonly"]
 		else:
@@ -147,6 +158,8 @@ def syncAbilityScore(ability : str, newValue : int):
 
 	data["abilities"][ability]["bonus"] = newBonus
 	document[ability + "Bonus"].value = newBonus
+
+	refreshArmorDisplay()
 
 def adjustAbilityScore(event):
 	ability = event.target.id.split('`')[0]
@@ -413,6 +426,67 @@ def updateClassLevelDivs():
 		)
 		document["classLevels"] <= div
 
+def refreshArmorDisplay():
+	if data["armorType"] == "light" or data["armorType"] == "unarmored":
+		document["armorClass`Value"].value = data["armorClass"] + ( \
+			data["abilities"]["dexterity"]["bonus"] \
+			if not document["armorClass`ShowBase"].checked \
+			else 0
+		)
+	elif data["armorType"] == "medium":
+		document["armorClass`Value"].value = data["armorClass"] + ( \
+			min(data["abilities"]["dexterity"]["bonus"], 2) \
+			if not document["armorClass`ShowBase"].checked \
+			else 0
+		)
+	elif data["armorType"] == "heavy":
+		document["armorClass`Value"].value = data["armorClass"]
+	elif data["armorType"] == "unarmoredB":
+		document["armorClass`Value"].value = data["armorClass"] + ( \
+			data["abilities"]["dexterity"]["bonus"] \
+			+ data["abilities"]["constitution"]["bonus"] \
+			if not document["armorClass`ShowBase"].checked \
+			else 0
+		)
+	elif data["armorType"] == "unarmoredM":
+		document["armorClass`Value"].value = data["armorClass"] + ( \
+			data["abilities"]["dexterity"]["bonus"] \
+			+ data["abilities"]["wisdom"]["bonus"] \
+			if not document["armorClass`ShowBase"].checked \
+			else 0
+		)
+	#elif data["armorType"] == "mage":
+	#	document["armorClass`Value"].value = (
+	#		13 + data["abilities"]["dexterity"]["bonus"] \
+	#		if not document["armorClass`ShowBase"].checked \
+	#		else data["armorClass"]
+	#	)
+	else:
+		print("Uh oh, something's wrong with the AC subroutines...")
+
+def updateArmor(event):
+	method = event.target.id.split('`')[1]
+
+	if method == "Type":
+		data["armorType"] = event.target.id.split('`')[0]
+	elif method == "Value":
+		try:
+			data["armorClass"] = int(event.target.value)
+		except ValueError:
+			dialog.InfoDialog(
+				"Armor Class Error",
+				"Please only enter integers in the AC field."
+			)
+
+	refreshArmorDisplay()
+
+document["armorClass`Value"].bind("input", updateArmor)
+document["armorClass`Edit"].bind("change", lambda e : toggleEditing(e, "ac"))
+document["armorClass`ShowBase"].bind("change", lambda e : refreshArmorDisplay())
+
+for r in document.select("input[name=\"armor\"]"):
+	r.bind("input", updateArmor)
+
 document["currencyEdit"].bind("change", lambda e : toggleEditing(e, "currency"))
 
 def exchangeCoins(event):
@@ -449,7 +523,6 @@ def exchangeCoins(event):
 document["gold"].bind("input", exchangeCoins)
 document["silver"].bind("input", exchangeCoins)
 document["copper"].bind("input", exchangeCoins)
-
 
 def adjustFeature(event):
 	feature = event.target.id.split('`')[0]
@@ -647,7 +720,13 @@ def reloadValues():
 	document["nextExperience"].value = data["experience"]["next"]
 	updateClassLevelDivs()
 
-	document["armorClass"].value = data["armorClass"]
+	#document["armorClass`Value"].value = data["armorClass"]
+	for r in document.select("input[name=\"armor\"]"):
+		if r.id.split('`')[0] == data["armorType"]:
+			r.checked = True
+			r.dispatchEvent(window.InputEvent.new("input"))
+			break
+	#refreshArmorDisplay()
 
 	for coin in coins:
 		document[coin].value = data["currency"][coin]

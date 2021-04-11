@@ -132,8 +132,30 @@
 
 				<div class = "minorGroup">
 					<label for = "armorClass"><h3>Armor Class</h3></label>
-					<input id = "armorClass" readonly>
-					<input id = "armorClassSet" type = "button" value = "Set">
+					<input id = "armorClass`Value" class = "ac" type = "number" readonly>
+					<label for = "armorClass`Edit">Edit Base AC</label>
+					<input id = "armorClass`Edit" type = "checkbox">
+					<label for = "armorClass`ShowBase">Show Base AC</label>
+					<input id = "armorClass`ShowBase" type = "checkbox">
+					<div id = "armorOptions">
+						<h3>Armor Type</h3>
+						<input type = "radio" name = "armor" id = "light`Type" value = "light`Type">
+						<label for = "light`Type">Light (= Base + DEX)</label> <br>
+						<input type = "radio" name = "armor" id = "medium`Type" value = "medium`Type">
+						<label for = "medium`Type">Medium (= Base + MIN(DEX, 2))</label> <br>
+						<input type = "radio" name = "armor" id = "heavy`Type" value = "heavy`Type">
+						<label for = "heavy`Type">Heavy (= Base)</label> <br>
+						<input type = "radio" name = "armor" id = "unarmored`Type" value = "unarmored`Type">
+						<label for = "unarmored`Type">Unarmored (Regular, = Base + DEX)</label> <br>
+						<input type = "radio" name = "armor" id = "unarmoredB`Type" value = "unarmoredB`Type">
+						<label for = "unarmoredB`Type">Unarmored (Barbarian, = Base + DEX + CON)</label> <br>
+						<input type = "radio" name = "armor" id = "unarmoredM`Type" value = "unarmoredM`Type"> 
+						<label for = "unarmoredM`Type">Unarmored (Monk, = Base + DEX + WIS)</label> <br>
+						<!--
+						<input type = "radio" name = "armor" id = "mage`Type" value = "mage`Type">
+						<label for = "mage`Type">Mage</label>
+						-->
+					</div>
 				</div>
 
 				<div class = "minorGroup">

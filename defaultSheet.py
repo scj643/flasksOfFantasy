@@ -68,6 +68,7 @@ defaultSheet = {
 		}
 	},
 	"armorClass": 10,
+	"armorType": "unarmored",
 	"currency": {
 		"gold": 0,
 		"silver": 0,
