@@ -31,6 +31,7 @@
 
 					<label for = "class">Class</label>
 					<input id = "class" class = "bio" readonly>
+					<input id = "classEdit" class = "bio" type = "button" value = "Edit Class(es)" readonly>
 					<label for = "alignment">Alignment</label>
 					<input id = "alignment" class = "bio" readonly>
 				</div>
@@ -63,7 +64,7 @@
 					<label for = "{{ability}}"><h3>{{ability|capitalize}}</h3></label>
 					<input id = "{{ability}}`Set" class = "abilityButton" type = "button" value = "Set" disabled>
 					<input id = "{{ability}}`Decrement" class = "abilityButton" type = "button" value = "-" disabled>
-					<input id = "{{ability}}" class = "ability" readonly>
+					<input id = "{{ability}}" class = "ability" readonly> <!--type = "number" min = 1 max = 30-->
 					<input id = "{{ability}}`Increment" class = "abilityButton" type = "button" value = "+" disabled>
 					<label for = "{{ability}}Bonus">Bonus</label>
 					<input id = "{{ability}}Bonus" class = "abilityBonus" readonly>
@@ -79,10 +80,10 @@
 					<label for = "hitEdit">Edit Hit Points</label>
 					<input id = "hitEdit" type = "checkbox">
 					<label for = "currentHit">Current Hit Points</label>
+					<!--<input id = "currentHit`Decrement" class = "hitButton" type = "button" value = "-" disabled>-->
+					<input id = "currentHit" class = "hit" type = "number" readonly>
+					<!--<input id = "currentHit`Increment" class = "hitButton" type = "button" value = "+" disabled>-->
 					<input id = "currentHit`Set" class = "hitButton" type = "button" value = "Set" disabled>
-					<input id = "currentHit`Decrement" class = "hitButton" type = "button" value = "-" disabled>
-					<input id = "currentHit" class = "hit" readonly>
-					<input id = "currentHit`Increment" class = "hitButton" type = "button" value = "+" disabled>
 
 					<label for = "maxHit">Maximum Hit Points</label>
 					<input id = "maxHit" class = "hit" readonly>
@@ -91,7 +92,6 @@
 					<div id = "hitDice">
 						<h4>Hit Dice</h4>
 					</div>
-					<input id = "editHitDice" class = "hitButton" type = "button" value = "Edit" disabled>
 
 					<div id = "deathSaves">
 						<h4>Death Saves</h4>
@@ -116,16 +116,15 @@
 					<label for = "characterLevel"><h4>Character Level</h4></label>
 					<input id = "characterLevel" class = "experience" readonly>
 					
-					<label for = "editLevels">Edit Level(s)</label>
-					<input id = "editLevels" type = "checkbox">
 					<div id = "classLevels">
 						<h4>Class Level(s)</h4>
 					</div>
-					<input id = "setLevels" type = "button" value = "Set Level(s)" disabled>
+					
+					<input id = "experience`Edit", type = "button" value = "Edit Experience">
 
 					<label for = "currentExperience">Experience Points</label>
 					<input id = "currentExperience" class = "experience" readonly>
-					<input id = "addExperience" type = "button" value = "Add">
+					<input id = "experience`Add" type = "button" value = "Add">
 					
 					<label for = "nextExperience">Needed for Next Level</label>
 					<input id = "nextExperience" class = "experience" readonly>
@@ -141,10 +140,10 @@
 					<h3>Currency</h3>
 					{% for coin in coins %}
 					<label for = "{{coin}}">{{coin|capitalize}}</label>
-					<input id = "{{coin}}`Set" class = "currencyButton" type = "button" value = "Set" disabled>
-					<input id = "{{coin}}`Decrement" class = "currencyButton" type = "button" value = "-" disabled>
-					<input id = "{{coin}}" class = "currency" readonly>
-					<input id = "{{coin}}`Increment" class = "currencyButton" type = "button" value = "+" disabled>
+					<!--<input id = "{{coin}}`Set" class = "currencyButton" type = "button" value = "Set" disabled>-->
+					<!--<input id = "{{coin}}`Decrement" class = "currencyButton" type = "button" value = "-" disabled> -->
+					<input id = "{{coin}}" class = "currency" type = "number" readonly>
+					<!--<input id = "{{coin}}`Increment" class = "currencyButton" type = "button" value = "+" disabled> -->
 					{% endfor %}
 					<input id = "currencySet" class = "currencyButton" type = "button" value = "Set All" disabled>
 				</div>

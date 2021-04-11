@@ -56,6 +56,86 @@ for field in document.select("input.bio"):
 		print(field.id)
 		document[field.id].bind("input", setBioData)
 
+def adjustClass(event):
+	editClassDialog = classEdit()
+	editClassDialog.select("#classList")[0].value = ", ".join(
+		data["biography"]["class"]
+	)
+	editClassDialog.select("#diceList")[0].value = ", ".join(
+		[str(data["hit"]["dice"][c]["die"]) for c in data["biography"]["class"]]
+	)
+	editClassDialog.select("#levelList")[0].value = ", ".join(
+		[
+			str(data["experience"]["level"]["classes"][c])
+			for c in data["biography"]["class"]
+		]
+	)
+
+	def okHandler(event):
+		classListString = editClassDialog.select("#classList")[0].value
+		diceListString = editClassDialog.select("#diceList")[0].value
+		levelListString = editClassDialog.select("#levelList")[0].value
+
+		classList = list(map(str.strip, classListString.split(',')))
+		diceList = list(map(str.strip, diceListString.split(',')))
+		levelList = list(map(str.strip, levelListString.split(',')))
+
+		try:
+			diceList = list(map(int, diceList))
+		except ValueError:
+			dialog.InfoDialog(
+				"Value Error",
+				"Dice entries must be integers!"
+			)
+			return
+		
+		try:
+			levelList = list(map(int, levelList))
+		except ValueError:
+			dialog.InfoDialog(
+				"Value Error",
+				"Level entries must be integers!"
+			)
+			return
+
+		if len(classList) != len(diceList):
+			dialog.InfoDialog(
+				"Mismatch Error",
+				"Number of classes not equal to number of dice!"
+			)
+			return
+		elif len(classList) != len(levelList):
+			dialog.InfoDialog(
+				"Mismatch Error",
+				"Number of classes not equal to number of levels!"
+			)
+			return
+		elif sum(levelList) != data["experience"]["level"]["character"]:
+			dialog.InfoDialog(
+				"Level Inequality Notice",
+				"The sum of your class level(s) is not equal to your character level. Please make sure to manually check this in the Experience section of the sheet and resynchronize it. Your changes will be still be committed though."
+			)
+
+		data["biography"]["class"] = sorted(classList)
+		data["hit"]["dice"] = {
+			c: {
+				"die": diceList[classList.index(c)],
+				"count": levelList[classList.index(c)]
+			}
+			for c in classList
+		}
+		data["experience"]["level"]["classes"] = {
+			c: levelList[classList.index(c)]
+			for c in classList
+		}
+
+		editClassDialog.close()
+		reloadValues()
+
+	editClassDialog.ok_button.bind("click", okHandler)
+
+document["classEdit"].bind("click", adjustClass)
+
 def calculateAbilityBonus(score : int) -> int:
 	return (score - 10) // 2
 
@@ -140,10 +220,10 @@ def makeDiceString(dieDictionaries : list) -> str:
 def updateHitDiceDivs():
 	for div in document.select("div.hitDiceDiv"):
 		del document[div.id]
-	for k in data["hit"]["dice"].keys():
+	for k in sorted(data["hit"]["dice"].keys()):
 		inputID = k + "`HitDice"
 		div = html.DIV(id = inputID + "Div", Class = "hitDiceDiv")
-		div <= html.LABEL(k.capitalize(), For = inputID)
+		div <= html.LABEL(k, For = inputID)
 		div <= html.INPUT(
 			id = inputID, value = makeDieString(
 				data["hit"]["dice"][k]["count"],
@@ -159,7 +239,16 @@ def toggleHitAdjustment(event):
 		else:
 			button.attrs["disabled"] = ''
 
+	if event.target.checked:
+		del document["currentHit"].attrs["readonly"]
+	else:
+		document["currentHit"].attrs["readonly"] = ''
+
 document["hitEdit"].bind("change", toggleHitAdjustment)
+
+def refreshHitPointBounds():
+	document["currentHit"].min = -data["hit"]["max"]
+	document["currentHit"].max = data["hit"]["max"]
 
 def syncHitPoints(field, newValue):
 	document[field].value = newValue
@@ -167,6 +256,7 @@ def syncHitPoints(field, newValue):
 	data["hit"][field] = newValue
 
 	if field == "max":
+		refreshHitPointBounds()
 		newCurrent = min(data["hit"]["max"], data["hit"]["current"])
 		document["currentHit"].value = newCurrent
 		data["hit"]["current"] = newCurrent
@@ -270,13 +360,21 @@ def determineLevel():
 		level += 1
 	return level
 
+def adjustExperience(event):
+	method = event.target.id.split('`')[1]
+
+	if method == "Add":
+		addExperienceDialog = experienceAdd()
+
+document["experience`Add"].bind("click", adjustExperience)
+
 def updateClassLevelDivs():
 	for div in document.select("div.classLevelDiv"):
 		del document[div.id]
-	for k in data["experience"]["level"]["classes"].keys():
+	for k in sorted(data["experience"]["level"]["classes"].keys()):
 		inputID = k + "`ClassLevel"
 		div = html.DIV(id = inputID + "Div", Class = "classLevelDiv")
-		div <= html.LABEL(k.capitalize(), For = inputID)
+		div <= html.LABEL(k, For = inputID)
 		div <= html.INPUT(
 			id = inputID,
 			value = data["experience"]["level"]["classes"][k],
@@ -385,24 +483,25 @@ def updateFeaturesTable():
 
 		numericCell = html.TD()
 		if data["features"][k]["type"] == "numeric":
-			decrementButton = html.INPUT(
-				id = inputID + "`Decrement", Class = "featureButton",
-				type = "button", value = "-"
-			)
-			decrementButton.bind("click", adjustFeature)
-			numericCell <= decrementButton
+		#	decrementButton = html.INPUT(
+		#		id = inputID + "`Decrement", Class = "featureButton",
+		#		type = "button", value = "-"
+		#	)
+		#	decrementButton.bind("click", adjustFeature)
+		#	numericCell <= decrementButton
 
 			numericCell <= html.INPUT(
 				id = inputID + "`Value",
-				value = data["features"][k]["value"], readonly = ''
+				value = data["features"][k]["value"],
+				type = "number", readonly = ''
 			)
 
-			incrementButton = html.INPUT(
-				id = inputID + "`Increment", Class = "featureButton",
-				type = "button", value = "+"
-			)
-			incrementButton.bind("click", adjustFeature)
-			numericCell <= incrementButton
+		#	incrementButton = html.INPUT(
+		#		id = inputID + "`Increment", Class = "featureButton",
+		#		type = "button", value = "+"
+		#	)
+		#	incrementButton.bind("click", adjustFeature)
+		#	numericCell <= incrementButton
 
 		row <= numericCell
 
@@ -448,6 +547,7 @@ def reloadValues():
 
 	document["currentHit"].value = data["hit"]["current"]
 	document["maxHit"].value = data["hit"]["max"]
+	refreshHitPointBounds()
 
 	updateHitDiceDivs()
 
