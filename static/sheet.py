@@ -542,6 +542,18 @@ def adjustFeature(event):
 		data["features"][feature]["value"] += changeValue
 		document[feature + "`Feature`Value"].value = data["features"][feature]["value"]
 
+	elif method == "Value":
+		try:
+			data["features"][feature]["value"] = int(
+				document[feature + "`Feature`Value"].value
+			)
+		except ValueError:
+			dialog.InfoDialog(
+				"Feature Value Error",
+				"Please only enter integers in the feature value fields."
+			)
+			document[feature + "`Feature`Value"].value = data["features"][feature]["value"]
+
 	elif method == "Delete":
 		deleteFeatDialog = featureDelete(feature)
 
@@ -613,6 +625,7 @@ def adjustFeature(event):
 		editFeatDialog.ok_button.bind("click", okHandler)
 
 document["Create Feature``New"].bind("click", adjustFeature)
+document["featuresEdit"].bind("change", lambda e : toggleEditing(e, "featureValue"))
 
 def updateFeaturesTable():
 	for row in document.select("tr.featureRow"):
@@ -633,10 +646,11 @@ def updateFeaturesTable():
 		#	numericCell <= decrementButton
 
 			numericCell <= html.INPUT(
-				id = inputID + "`Value",
+				id = inputID + "`Value", Class = "featureValue",
 				value = data["features"][k]["value"],
 				type = "number", readonly = ''
 			)
+			numericCell.bind("input", adjustFeature)
 
 		#	incrementButton = html.INPUT(
 		#		id = inputID + "`Increment", Class = "featureButton",

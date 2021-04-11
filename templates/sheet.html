@@ -176,10 +176,31 @@
 					<input id = "currencySet" class = "currencyButton" type = "button" value = "Set All" disabled>
 				</div>
 			</div>
+			<div id = "skillsDiv" class = "majorGroup">
+				<h2>Proficiency & Skills</h2>
+				<label for = "proficiency"><h3>Proficiency Bonus</h3></label>
+				<input id = "proficiency" readonly>
+				<br>
+				<input id = "Create Skill``New" class = "skillButton" type = "button" value = "Create Skill">
+				<table id = "skillsTable" class = "minorGroup">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Ability</th>
+							<th>Value</th>
+							<th>Settings</th>
+						</tr>
+					</thead>
+					<tbody id = "skills">
+					</tbody>
+				</table>
+			</div>
 			<div id = "featuresDiv" class = "majorGroup">
 				<h2>Features</h2>
 				<input id = "Create Feature``New" class = "featureButton" type = "button" value = "Create Feature">
-				<table id = "featuresTable">
+				<label for = "featuresEdit">Edit Feature Values</label>
+				<input id = "featuresEdit" type = "checkbox">
+				<table id = "featuresTable" class = "minorGroup">
 					<thead>
 						<tr>
 							<th>Name</th>
@@ -191,6 +212,37 @@
 					<tbody id = "features">
 					</tbody>
 				</table>
+			</div>
+			<div id = "itemsDiv" class = "majorGroup">
+				<h2>Inventory</h2>
+				<input id = "Create Item``New" class = "itemButton" type = "button" value = "Create Item">
+				<table id = "itemsTable" class = "minorGroup">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Description</th>
+							<th>Count</th>
+							<th>Weight</th>
+							<th>Value</th>
+							<th colspan = 2>Weapon Info (optional)</th>
+							<th>Settings</th>
+						</tr>
+						<tr>
+							<th colspan = 5></th>
+							<th>Type</th>
+							<th>Damage</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody id = "items">
+					</tbody>
+				</table>
+			</div>
+			<div id = "spellsDiv" class = "majorGroup">
+				<h2>Spells<h2>
+				<input id = "Create Spell List``NewList" class = "spellButton" type = "button" value = "Create Spell List">
+				<div id = "spellTablesDiv" class = "minorGroup">
+				</div>
 			</div>
 		</div>
 	</body>
