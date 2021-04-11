@@ -81,7 +81,7 @@
 					<input id = "hitEdit" type = "checkbox">
 					<label for = "currentHit">Current Hit Points</label>
 					<!--<input id = "currentHit`Decrement" class = "hitButton" type = "button" value = "-" disabled>-->
-					<input id = "currentHit" class = "hit" type = "number" readonly>
+					<input id = "currentHit`Value" class = "hit" type = "number" readonly>
 					<!--<input id = "currentHit`Increment" class = "hitButton" type = "button" value = "+" disabled>-->
 					<input id = "currentHit`Set" class = "hitButton" type = "button" value = "Set" disabled>
 
@@ -138,11 +138,17 @@
 
 				<div class = "minorGroup">
 					<h3>Currency</h3>
+					<label for = "currencyEdit">Edit Currency</label>
+					<input id = "currencyEdit" type = "checkbox">
 					{% for coin in coins %}
 					<label for = "{{coin}}">{{coin|capitalize}}</label>
 					<!--<input id = "{{coin}}`Set" class = "currencyButton" type = "button" value = "Set" disabled>-->
 					<!--<input id = "{{coin}}`Decrement" class = "currencyButton" type = "button" value = "-" disabled> -->
-					<input id = "{{coin}}" class = "currency" type = "number" readonly>
+					{% if coin == "gold" %}
+					<input id = "{{coin}}" class = "currency" type = "number" min = "0" readonly>
+					{% else %}
+					<input id = "{{coin}}" class = "currency" type = "number" min = "0" max = "100" readonly>
+					{% endif %}
 					<!--<input id = "{{coin}}`Increment" class = "currencyButton" type = "button" value = "+" disabled> -->
 					{% endfor %}
 					<input id = "currencySet" class = "currencyButton" type = "button" value = "Set All" disabled>

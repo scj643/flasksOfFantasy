@@ -9,7 +9,7 @@ sheetName = document["sheetName"]["content"]
 
 bioCompoundFields = ("class", "height", "weight")
 coins = ("gold", "silver", "copper")
-levelsAndEXP = {
+levelsAndEXPRequired = {
 	1: 0,
 	2: 300,
 	3: 900,
@@ -240,17 +240,19 @@ def toggleHitAdjustment(event):
 			button.attrs["disabled"] = ''
 
 	if event.target.checked:
-		del document["currentHit"].attrs["readonly"]
+		del document["currentHit`Value"].attrs["readonly"]
 	else:
-		document["currentHit"].attrs["readonly"] = ''
+		document["currentHit`Value"].attrs["readonly"] = ''
 
 document["hitEdit"].bind("change", toggleHitAdjustment)
 
 def refreshHitPointBounds():
-	document["currentHit"].min = -data["hit"]["max"]
-	document["currentHit"].max = data["hit"]["max"]
+	document["currentHit`Value"].min = -data["hit"]["max"]
+	document["currentHit`Value"].max = data["hit"]["max"]
 
 def syncHitPoints(field, newValue):
+	if field == "currentHit":
+		field = "currentHit`Value"
 	document[field].value = newValue
 	field = field.split("Hit")[0]
 	data["hit"][field] = newValue
@@ -258,7 +260,7 @@ def syncHitPoints(field, newValue):
 	if field == "max":
 		refreshHitPointBounds()
 		newCurrent = min(data["hit"]["max"], data["hit"]["current"])
-		document["currentHit"].value = newCurrent
+		document["currentHit`Value"].value = newCurrent
 		data["hit"]["current"] = newCurrent
 
 def adjustHitPoints(event):
@@ -279,6 +281,18 @@ def adjustHitPoints(event):
 			newValue = oldValue - 1
 		else:
 			newValue = oldValue
+	elif method == "Value":
+		try:
+			newValue = int(event.target.value)
+			data["hit"]["current"] = newValue
+			return
+		except ValueError:
+			dialog.InfoDialog(
+				"Hit Point Error",
+				"Please only enter integers in the current hit points field."
+			)
+			event.target.value = data["hit"]["current"]
+			return
 	elif method == "Set":	
 		newValueDialog = dialog.EntryDialog(
 			"Set " + fieldKeyword.capitalize() + " Hit Points",
@@ -322,6 +336,8 @@ def adjustHitPoints(event):
 for button in document.select(".hitButton"):
 	button.bind("click", adjustHitPoints)
 
+document["currentHit`Value"].bind("input", adjustHitPoints)
+
 def processDeathSaves(event):
 	kind = event.target.id.split('`')[0]
 	count = int(event.target.id.split('`')[1])
@@ -354,9 +370,9 @@ def processDeathSaves(event):
 for box in document.select(".deathSaveCheckbox"):
 	box.bind("change", processDeathSaves)
 
-def determineLevel():
-	level = 1
-	while data["experience"]["total"] >= levelsAndEXP[level]:
+def determineLevel() -> int:
+	level = 0
+	while data["experience"]["total"] >= levelsAndEXPRequired[level + 1]:
 		level += 1
 	return level
 
@@ -365,6 +381,21 @@ def adjustExperience(event):
 
 	if method == "Add":
 		addExperienceDialog = experienceAdd()
+
+		def okHandler(event):
+			try:
+				newXP = int(addExperienceDialog.select("#xpAmount")[0].value)
+				data["experience"]["total"] += newXP
+				data["experience"]["level"]["character"] = determineLevel()
+				data["experience"]["next"] = levelsAndEXPRequired[
+					data["experience"]["level"]["character"] + 1
+				]
+				addExperienceDialog.close()
+				reloadValues()
+			except ValueError:
+				dialog.InfoDialog("Value Error", "Please enter an integer")
+
+		addExperienceDialog.ok_button.bind("click", okHandler)
 
 document["experience`Add"].bind("click", adjustExperience)
 
@@ -381,6 +412,44 @@ def updateClassLevelDivs():
 			readonly = ''
 		)
 		document["classLevels"] <= div
+
+document["currencyEdit"].bind("change", lambda e : toggleEditing(e, "currency"))
+
+def exchangeCoins(event):
+	try:
+		amount = int(event.target.value)
+	except ValueError:
+		dialog.InfoDialog(
+			"Currency Error", "Please only enter integers in the currency fields."
+		)
+		event.target.value = data["currency"][event.target.id]
+		return
+
+	data["currency"][event.target.id] = int(event.target.value)
+
+	if event.target.id == "gold":
+		return
+	elif amount < 100:
+		return
+	else:
+		event.target.value = 0
+
+	if event.target.id == "silver":
+		data["currency"]["silver"] = 0
+		data["currency"]["gold"] += 1
+		reloadValues()
+	elif event.target.id == "copper":
+		data["currency"]["copper"] = 0
+		data["currency"]["silver"] += 1
+		if data["currency"]["silver"] == 100:
+			data["currency"]["silver"] = 0
+			data["currency"]["gold"] += 1
+		reloadValues()
+
+document["gold"].bind("input", exchangeCoins)
+document["silver"].bind("input", exchangeCoins)
+document["copper"].bind("input", exchangeCoins)
+
 
 def adjustFeature(event):
 	feature = event.target.id.split('`')[0]
@@ -545,7 +614,7 @@ def reloadValues():
 		document[k].value = data["abilities"][k]["score"]
 		document[k + "Bonus"].value = data["abilities"][k]["bonus"]
 
-	document["currentHit"].value = data["hit"]["current"]
+	document["currentHit`Value"].value = data["hit"]["current"]
 	document["maxHit"].value = data["hit"]["max"]
 	refreshHitPointBounds()
 

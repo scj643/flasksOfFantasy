@@ -59,7 +59,7 @@ def featureEdit(feature : str) -> dialog.Dialog:
 	d.panel <= numericCheck
 	d.panel <= html.BR()
 	d.panel <= html.LABEL("Feature Value", For = "value")
-	d.panel <= html.INPUT(id = "value", readonly = '')
+	d.panel <= html.INPUT(id = "value", Type = "number", readonly = '')
 
 	return d
 
