@@ -1,13 +1,24 @@
+# IMPORTS
 from browser import document, html, window
 import browser.widgets.dialog as dialog
 from common import *
 from sheetDialog import *
 import json
 
+# GLOBAL VARS
 data = {}
 sheetName = document["sheetName"]["content"]
 
+# CONSTANTS
 bioCompoundFields = ("class", "height", "weight")
+abilityTranslator = {
+	"str": "strength",
+	"dex": "dexterity",
+	"con": "constitution",
+	"int": "intelligence",
+	"wis": "wisdom",
+	"cha": "charisma"
+}
 coins = ("gold", "silver", "copper")
 levelsAndEXPRequired = {
 	1: 0,
@@ -32,6 +43,7 @@ levelsAndEXPRequired = {
 	20: 355000
 }
 
+# BIOGRAPHY FUNCTIONS
 def toggleEditing(event, group):
 	for field in document.select("input." + group):
 		#print(field)
@@ -147,6 +159,7 @@ def adjustClass(event):
 
 document["classEdit"].bind("click", adjustClass)
 
+# ABILITY SCORE FUNCTIONS
 def calculateAbilityBonus(score : int) -> int:
 	return (score - 10) // 2
 
@@ -221,6 +234,7 @@ for button in document.select(".abilityButton"):
 	#print(button)
 	button.bind("click", adjustAbilityScore)
 
+# DICE STRING FUNCTIONS
 def makeDieDict(count : int, die : int) -> dict:
 	return {"count": count, "die": die}
 
@@ -230,6 +244,7 @@ def makeDieString(count : int, die : int) -> str:
 def makeDiceString(dieDictionaries : list) -> str:
 	return " + ".join([makeDieString(die["count"], die["die"]) for die in dieDictionaries])
 
+# HIT POINT FUNCTIONS
 def updateHitDiceDivs():
 	for div in document.select("div.hitDiceDiv"):
 		del document[div.id]
@@ -383,6 +398,7 @@ def processDeathSaves(event):
 for box in document.select(".deathSaveCheckbox"):
 	box.bind("change", processDeathSaves)
 
+# EXPERIENCE FUNCTIONS
 def determineLevel() -> int:
 	level = 0
 	while data["experience"]["total"] >= levelsAndEXPRequired[level + 1]:
@@ -426,6 +442,7 @@ def updateClassLevelDivs():
 		)
 		document["classLevels"] <= div
 
+# ARMOR CLASS FUNCTIONS
 def refreshArmorDisplay():
 	if data["armorType"] == "light" or data["armorType"] == "unarmored":
 		document["armorClass`Value"].value = data["armorClass"] + ( \
@@ -487,6 +504,7 @@ document["armorClass`ShowBase"].bind("change", lambda e : refreshArmorDisplay())
 for r in document.select("input[name=\"armor\"]"):
 	r.bind("input", updateArmor)
 
+# CURRENCY FUNCTIONS
 document["currencyEdit"].bind("change", lambda e : toggleEditing(e, "currency"))
 
 def exchangeCoins(event):
@@ -524,6 +542,61 @@ document["gold"].bind("input", exchangeCoins)
 document["silver"].bind("input", exchangeCoins)
 document["copper"].bind("input", exchangeCoins)
 
+# PROFICIENCIES FUNCTIONS
+def calculateProficiencyBonus(level : int) -> int:
+	return (level - 1) // 4 + 2
+
+def adjustSkill(event):
+	pass
+
+def updateSkillsTable():
+	proficiencyBonus = calculateProficiencyBonus(
+		data["experience"]["level"]["character"]
+	)
+	for row in document.select("tr.skillRow"):
+		del document[row.id]
+	for k in sorted(data["proficiency"]["skills"]):
+		inputID = k + "`Skill"
+		ability = data["proficiency"]["skills"][k]
+		row = html.TR(id = inputID + "`Row", Class = "skillRow")
+
+		row <= html.TD(k)
+
+		skillData = html.TD()
+		skillBold = html.B(ability.upper())
+		skillData <= skillBold
+		row <= skillData
+
+		skillData = html.TD()
+		skillValue = html.INPUT(
+			id = inputID + "`Value",
+			value = data["abilities"][abilityTranslator[ability]]["bonus"] \
+				+ proficiencyBonus,
+			Type = "number", readonly = ''
+		)
+		skillData <= skillValue
+		row <= skillData
+
+		skillSettings = html.TD()
+
+		skillEditButton = html.INPUT(
+			id = inputID + "`Edit", Class = "skillButton",
+			type = "button", value = "Edit"
+		)
+		skillEditButton.bind("click", adjustSkill)
+		skillSettings <= skillEditButton
+		skillDeleteButton = html.INPUT(
+			id = inputID + "`Delete", Class = "skillButton",
+			type = "button", value = "Delete"
+		)
+		skillDeleteButton.bind("click", adjustSkill)
+		skillSettings <= skillDeleteButton
+
+		row <= skillSettings
+
+		document["skills"] <= row
+
+# FEATURE FUNCTIONS
 def adjustFeature(event):
 	feature = event.target.id.split('`')[0]
 	method = event.target.id.split('`')[2]
@@ -680,6 +753,7 @@ def updateFeaturesTable():
 
 		document["features"] <= row
 
+# GENERAL/NETWORK/OTHER FUNCTIONS
 def reloadValues():
 	global data
 	for k in data["biography"].keys():
@@ -745,6 +819,10 @@ def reloadValues():
 	for coin in coins:
 		document[coin].value = data["currency"][coin]
 
+	document["proficiency"].value = calculateProficiencyBonus(
+		data["experience"]["level"]["character"]
+	)
+	updateSkillsTable()
 	updateFeaturesTable()
 
 def jsonHandler(response):
@@ -770,6 +848,5 @@ def saveSheet(event):
 
 document["save"].bind("click", saveSheet)
 
-#print(document["sheetName"])
-
+# INITIAL FETCH OF SHEET DATA
 downloadSheetRequest(PseudoEvent(" `" + sheetName), jsonHandler)
