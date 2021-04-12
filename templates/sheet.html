@@ -115,22 +115,23 @@
 					<h3>Experience</h3>
 					<label for = "characterLevel"><h4>Character Level</h4></label>
 					<input id = "characterLevel" class = "experience" readonly>
+					<input id = "characterLevelSet" type = "button" value = "Set Character Level">
 					
 					<div id = "classLevels">
 						<h4>Class Level(s)</h4>
+						<input id = "classLevelsEdit" type = "button" value = "Edit Class Levels">
 					</div>
 					
-					<input id = "experience`Edit", type = "button" value = "Edit Experience">
-
 					<label for = "currentExperience">Experience Points</label>
 					<input id = "currentExperience" class = "experience" readonly>
 					<input id = "experience`Add" type = "button" value = "Add">
+					<input id = "experience`Edit", type = "button" value = "Edit">
 					
 					<label for = "nextExperience">Needed for Next Level</label>
 					<input id = "nextExperience" class = "experience" readonly>
 				</div>
 
-				<div class = "minorGroup">
+				<div id = "armorDiv" class = "minorGroup">
 					<label for = "armorClass"><h3>Armor Class</h3></label>
 					<input id = "armorClass`Value" class = "ac" type = "number" readonly>
 					<label for = "armorClass`Edit">Edit Base AC</label>
@@ -158,7 +159,7 @@
 					</div>
 				</div>
 
-				<div class = "minorGroup">
+				<div id = "currency" class = "minorGroup">
 					<h3>Currency</h3>
 					<label for = "currencyEdit">Edit Currency</label>
 					<input id = "currencyEdit" type = "checkbox">
@@ -173,7 +174,7 @@
 					{% endif %}
 					<!--<input id = "{{coin}}`Increment" class = "currencyButton" type = "button" value = "+" disabled> -->
 					{% endfor %}
-					<input id = "currencySet" class = "currencyButton" type = "button" value = "Set All" disabled>
+					<!--<input id = "currencySet" class = "currencyButton" type = "button" value = "Set All" disabled>-->
 				</div>
 			</div>
 			<div id = "skillsDiv" class = "majorGroup">
@@ -181,6 +182,8 @@
 				<label for = "proficiency"><h3>Proficiency Bonus</h3></label>
 				<input id = "proficiency" readonly>
 				<br>
+
+				<h3>Skills</h3>
 				<input id = "Create Skill``New" class = "skillButton" type = "button" value = "Create Skill">
 				<table id = "skillsTable" class = "minorGroup">
 					<thead>

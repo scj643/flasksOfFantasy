@@ -40,7 +40,8 @@ levelsAndEXPRequired = {
 	17: 225000,
 	18: 265000,
 	19: 305000,
-	20: 355000
+	20: 355000,
+	21: float("inf")
 }
 
 # BIOGRAPHY FUNCTIONS
@@ -76,8 +77,16 @@ def setBioData(event):
 document["biographyEdit"].bind("change", lambda e : toggleEditing(e, "bio"))
 for field in document.select("input.bio"):
 	if field.id not in bioCompoundFields:
-		print(field.id)
+		#print(field.id)
 		document[field.id].bind("input", setBioData)
+
+def levelSyncCheck():
+	if data["experience"]["level"]["character"] != \
+		sum(data["experience"]["level"]["classes"].values()):
+		dialog.InfoDialog(
+			"Level Inequality Notice",
+			"The sum of your class level(s) is not equal to your character level. Please make sure to check this and resynchronize it manually."
+		)
 
 def adjustClass(event):
 	editClassDialog = classEdit()
@@ -93,6 +102,11 @@ def adjustClass(event):
 			for c in data["biography"]["class"]
 		]
 	)
+	if event.target.id == "classLevelsEdit":
+		editClassDialog.select("#levelsCheck")[0].checked = True
+		editClassDialog.select("#levelsCheck")[0].dispatchEvent(
+			window.Event.new("change")
+		)
 
 	def okHandler(event):
 		classListString = editClassDialog.select("#classList")[0].value
@@ -133,12 +147,7 @@ def adjustClass(event):
 				"Number of classes not equal to number of levels!"
 			)
 			return
-		elif sum(levelList) != data["experience"]["level"]["character"]:
-			dialog.InfoDialog(
-				"Level Inequality Notice",
-				"The sum of your class level(s) is not equal to your character level. Please make sure to manually check this in the Experience section of the sheet and resynchronize it. Your changes will be still be committed though."
-			)
-
+		
 		data["biography"]["class"] = sorted(classList)
 		data["hit"]["dice"] = {
 			c: {
@@ -152,6 +161,7 @@ def adjustClass(event):
 			for c in classList
 		}
 
+		levelSyncCheck()
 		editClassDialog.close()
 		reloadValues()
 
@@ -328,7 +338,6 @@ def adjustHitPoints(event):
 		)
 		def entryHandler(e):
 			newValue = newValueDialog.value
-			newValueDialog.close()
 			try:
 				newValue = int(newValue)
 				if newValue < 1 and field == "maxHit":
@@ -343,6 +352,7 @@ def adjustHitPoints(event):
 					)
 				elif field == "maxHit" or field == "currentHit" \
 					and newValue <= data["hit"]["max"]:
+					newValueDialog.close()
 					syncHitPoints(field, newValue)
 				else:
 					dialog.InfoDialog(
@@ -405,28 +415,64 @@ def determineLevel() -> int:
 		level += 1
 	return level
 
+def setLevel(event):
+	levelSetDialog = levelSet()
+
+	def okHandler(event):
+		try:
+			newCharacterLevel = int(levelSetDialog.select("#newCharLevel")[0].value)
+			if newCharacterLevel < 1 or newCharacterLevel > 20:
+				dialog.InfoDialog("Value Error", "Please enter a number from 1 to 20.")
+				return
+			data["experience"]["level"]["character"] = newCharacterLevel
+			data["experience"]["total"] = levelsAndEXPRequired[
+				newCharacterLevel
+			]
+			data["experience"]["next"] = levelsAndEXPRequired[
+				newCharacterLevel + 1
+			]
+			levelSyncCheck()
+			levelSetDialog.close()
+			reloadValues()
+		except ValueError:
+			dialog.InfoDialog("Value Error", "Please enter an integer number.")
+	
+	levelSetDialog.ok_button.bind("click", okHandler)
+
+document["characterLevelSet"].bind("click", setLevel)
+document["classLevelsEdit"].bind("click", adjustClass)
+
 def adjustExperience(event):
 	method = event.target.id.split('`')[1]
 
-	if method == "Add":
-		addExperienceDialog = experienceAdd()
+	addExperienceDialog = experienceAdjust(method)
 
-		def okHandler(event):
-			try:
-				newXP = int(addExperienceDialog.select("#xpAmount")[0].value)
+	def okHandler(event):
+		try:
+			newXP = int(addExperienceDialog.select("#xpAmount")[0].value)
+			if newXP < 0:
+				dialog.InfoDialog("Value Error", "Experience must be non-negative!")
+				return
+			if method == "Add":
 				data["experience"]["total"] += newXP
-				data["experience"]["level"]["character"] = determineLevel()
-				data["experience"]["next"] = levelsAndEXPRequired[
-					data["experience"]["level"]["character"] + 1
-				]
-				addExperienceDialog.close()
-				reloadValues()
-			except ValueError:
-				dialog.InfoDialog("Value Error", "Please enter an integer")
+			elif method == "Edit":
+				data["experience"]["total"] = newXP
 
-		addExperienceDialog.ok_button.bind("click", okHandler)
+			data["experience"]["level"]["character"] = determineLevel()
+			data["experience"]["next"] = levelsAndEXPRequired[
+				data["experience"]["level"]["character"] + 1
+			]
+
+			levelSyncCheck()
+			addExperienceDialog.close()
+			reloadValues()
+		except ValueError:
+			dialog.InfoDialog("Value Error", "Please enter an integer.")
+
+	addExperienceDialog.ok_button.bind("click", okHandler)
 
 document["experience`Add"].bind("click", adjustExperience)
+document["experience`Edit"].bind("click", adjustExperience)
 
 def updateClassLevelDivs():
 	for div in document.select("div.classLevelDiv"):
@@ -547,7 +593,68 @@ def calculateProficiencyBonus(level : int) -> int:
 	return (level - 1) // 4 + 2
 
 def adjustSkill(event):
-	pass
+	skill = event.target.id.split('`')[0]
+	method = event.target.id.split('`')[2]
+	creatingSkill = False
+
+	if method == "New":
+		creatingSkill = True
+		method = "Edit"
+
+	if method == "Delete":
+		deleteSkillDialog = listEntryDelete(skill, "skill")
+
+		def deleteHandler(event):
+			del data["proficiency"]["skills"][skill]
+			deleteSkillDialog.close()
+			updateSkillsTable()
+
+		deleteSkillDialog.ok_button.bind("click", deleteHandler)
+
+	elif method == "Edit":
+		editSkillDialog = skillEdit(skill)
+
+		if not creatingSkill:
+			editSkillDialog.select("#name")[0].value = skill
+			editSkillDialog.select(
+				"#" + abilityTranslator[data["proficiency"]["skills"][skill]] + "RB"
+			)[0].checked = True
+		else:
+			editSkillDialog.select("#strengthRB")[0].checked = True
+
+		def okHandler(event):
+			newSkillName = editSkillDialog.select("#name")[0].value
+			newSkillAbility = ''
+			for r in editSkillDialog.select("input[name=\"ability\"]"):
+				if r.checked:
+					newSkillAbility = r.value
+					break
+
+			if newSkillAbility == '':
+				dialog.InfoDialog(
+					"Radio Button Error",
+					"Couldn't detect an ability, this shoulnd't be happening!"
+				)
+				return
+
+			if newSkillName != skill \
+				and newSkillName in data["proficiency"]["skills"].keys():
+				dialog.InfoDialog(
+					"Name Error",
+					"A skill already exists with that name, please enter another one."
+				)
+				return
+
+			data["proficiency"]["skills"][newSkillName] = newSkillAbility
+			if newSkillName != skill and not creatingSkill:
+				del data["proficiency"]["skills"][skill]
+
+			editSkillDialog.close()
+			updateSkillsTable()
+
+		editSkillDialog.ok_button.bind("click", okHandler)
+
+document["Create Skill``New"].bind("click", adjustSkill)
 
 def updateSkillsTable():
 	proficiencyBonus = calculateProficiencyBonus(
@@ -628,7 +735,7 @@ def adjustFeature(event):
 			document[feature + "`Feature`Value"].value = data["features"][feature]["value"]
 
 	elif method == "Delete":
-		deleteFeatDialog = featureDelete(feature)
+		deleteFeatDialog = listEntryDelete(feature, "feature")
 
 		def deleteHandler(event):
 			del data["features"][feature]
@@ -819,10 +926,12 @@ def reloadValues():
 	for coin in coins:
 		document[coin].value = data["currency"][coin]
 
-	document["proficiency"].value = calculateProficiencyBonus(
+	data["proficiency"]["bonus"] = calculateProficiencyBonus(
 		data["experience"]["level"]["character"]
 	)
+	document["proficiency"].value = data["proficiency"]["bonus"]
 	updateSkillsTable()
+
 	updateFeaturesTable()
 
 def jsonHandler(response):
@@ -850,3 +959,4 @@ document["save"].bind("click", saveSheet)
 
 # INITIAL FETCH OF SHEET DATA
 downloadSheetRequest(PseudoEvent(" `" + sheetName), jsonHandler)
+
