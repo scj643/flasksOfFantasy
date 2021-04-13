@@ -911,9 +911,15 @@ def adjustItem(event):
 					"#damageType" + \
 						data["inventory"][item]["weapon"]["damage"]["type"][0].upper()
 				)[0].checked = True
-				for k in ("count", "value", "bonus"):
+				for k in ("count", "die", "bonus"):
 					editItemDialog.select("#dmg" + k.capitalize())[0].value = \
-						data["inventory"][item]["weapon"]["damage"][k]				
+						data["inventory"][item]["weapon"]["damage"][k]
+			else:
+				editItemDialog.select("#weaponTypeSM")[0].checked = True
+				editItemDialog.select("#damageTypeB")[0].checked = True
+				for i in ("#dmgCount", "#dmgDie", "#dmgBonus"):
+					editItemDialog.select(i)[0].value = 0
+
 		else:
 			for k in ("count", "weight"):
 				editItemDialog.select('#' + k)[0].value = 0
@@ -921,11 +927,92 @@ def adjustItem(event):
 				editItemDialog.select('#' + coin)[0].value = 0
 			editItemDialog.select("#weaponTypeSM")[0].checked = True
 			editItemDialog.select("#damageTypeB")[0].checked = True
-			for i in ("#dmgDiceCount", "#dmgDiceValue", "#dmgBonus"):
+			for i in ("#dmgCount", "#dmgDie", "#dmgBonus"):
 				editItemDialog.select(i)[0].value = 0
 
 		def okHandler(event):
-			print("Foo")
+			newItemName = editItemDialog.select("#name")[0].value
+			if newItemName != item and newItemName in data["inventory"].keys():
+				dialog.InfoDialog(
+					"Name Error",
+					"An item already exists with that name. Please choose another one."
+				)
+				return
+			
+			for i in ("count", "weight") + coins:
+				try:
+					if i == "weight" and \
+						float(editItemDialog.select('#' + i)[0].value) < 0.0:
+						dialog.InfoDialog(
+							"Weight Error",
+							"Weight must be non-negative!"
+						)
+						return
+					elif i != "weight" and \
+						int(editItemDialog.select('#' + i)[0].value) < 0:
+						dialog.InfoDialog(
+							i.capitalize() + " Error",
+							i.capitalize() + " must be non-negative!"
+						)
+						return
+				except ValueError:
+					dialog.InfoDialog(
+						i.capitalize() + " Error",
+						i.capitalize() + " must be a number!"
+					)
+					return
+
+			if editItemDialog.select("#weaponCheck")[0].checked:
+				for i in ("Count", "Die", "Bonus"):
+					try:
+						if int(editItemDialog.select('#dmg' + i)[0].value) < 0:
+							dialog.InfoDialog(
+								"Damage " + i.capitalize() + " Error",
+								"Damage " + i.capitalize() + " must be non-negative!"
+							)
+							return
+					except ValueError:
+						dialog.InfoDialog(
+							"Damage " + i.capitalize() + " Error",
+							"Damage " + i.capitalize() + " must be an integer!"
+						)
+						return
+
+				newItemWeapon = {"damage": {}}
+				for name in ("kind", "type"):
+					for r in editItemDialog.select(
+						"input[name = \"" + name + "\"]"
+					):
+						if r.checked:
+							if name == "kind":
+								newItemWeapon[name] = r.value
+							elif name == "type":
+								newItemWeapon["damage"][name] = r.value
+							break
+				
+				for i in ("count", "die", "bonus"):
+					newItemWeapon["damage"][i] = int(
+						editItemDialog.select('#dmg' + i.capitalize())[0].value
+					)
+
+			newItem = {
+				"description": editItemDialog.select("#description")[0].value,
+				"count": int(editItemDialog.select("#count")[0].value),
+				"weight": float(editItemDialog.select("#weight")[0].value),
+				"value": {
+					coin: int(editItemDialog.select('#' + coin)[0].value)
+					for coin in coins
+				}
+			}
+			if editItemDialog.select("#weaponCheck")[0].checked:
+				newItem["weapon"] = newItemWeapon
+
+			data["inventory"][newItemName] = newItem
+			if newItemName != item and not creatingItem:
+				del data["inventory"][item]
+
+			editItemDialog.close()
+			updateItemsTable()
 
 		editItemDialog.ok_button.bind("click", okHandler)
 
@@ -937,7 +1024,22 @@ def makeDamageString(damageDict : dict) -> str:
 		+ " (" + str(damageDict["count"] + damageDict["bonus"]) + '-' \
 		+ str(damageDict["count"] * damageDict["die"] + damageDict["bonus"]) + ')'
 
+def calculateTotalWeight() -> float:
+	return sum(
+		data["inventory"][i]["count"] *
+		data["inventory"][i]["weight"]
+		for i in data["inventory"].keys()
+	)
+
 def updateItemsTable():
+	def makeWeaponKindString(kind : str) -> str:
+		if kind[0] == 's':
+			return kind[:6].capitalize() + ' ' + kind[6:]
+		else:
+			return kind[:7].capitalize() + ' ' + kind[7:]
+	
+	document["totalWeight"].value = calculateTotalWeight()
+
 	for row in document.select("tr.itemRow"):
 		del document[row.id]
 	for k in sorted(data["inventory"].keys()):
@@ -970,7 +1072,11 @@ def updateItemsTable():
 		row <= itemValueCell
 
 		if "weapon" in data["inventory"][k].keys():
-			row <= html.TD(data["inventory"][k]["weapon"]["kind"])
+			row <= html.TD(
+				makeWeaponKindString(
+					data["inventory"][k]["weapon"]["kind"]
+				)
+			)
 			row <= html.TD(
 				makeDamageString(data["inventory"][k]["weapon"]["damage"])
 			)

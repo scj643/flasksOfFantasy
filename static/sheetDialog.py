@@ -199,9 +199,9 @@ def itemEdit(item : str) -> dialog.Dialog:
 		id = "dmgCount", Class = "weapon",
 		type = "number", min = 0, readonly = ''
 	)
-	d.panel <= html.LABEL("Damage Dice Value:", For = "dmgValue")
+	d.panel <= html.LABEL("Damage Dice Value:", For = "dmgDie")
 	d.panel <= html.INPUT(
-		id = "dmgValue", Class = "weapon",
+		id = "dmgDie", Class = "weapon",
 		type = "number", min = 0, readonly = ''
 	)
 	d.panel <= html.BR()
