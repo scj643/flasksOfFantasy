@@ -873,7 +873,63 @@ def updateFeaturesTable():
 
 # INVENTORY FUNCTIONS
 def adjustItem(event):
-	editItemDialog = itemEdit("foo")
+	item = event.target.id.split('`')[0]
+	method = event.target.id.split('`')[2]
+	creatingItem = False
+
+	if method == "New":
+		creatingItem = True
+		method = "Edit"
+
+	if method == "Edit":
+		weaponTypeTranslator = {
+			"simpleMelee": "SM",
+			"simpleRanged": "SR",
+			"martialMelee": "MM",
+			"martialRanged": "MR"
+		}
+		editItemDialog = itemEdit(item)
+		if not creatingItem:
+			editItemDialog.select("#name")[0].value = item
+			for k in ("description", "count", "weight"):
+				editItemDialog.select('#' + k)[0].value = data["inventory"][item][k]
+			for coin in coins:
+				editItemDialog.select('#' + coin)[0].value = \
+					data["inventory"][item]["value"][coin]
+			if "weapon" in data["inventory"][item].keys() \
+				and data["inventory"][item]["weapon"]["kind"] != "none":
+				editItemDialog.select("#weaponCheck")[0].checked = True
+				editItemDialog.select("#weaponCheck")[0].dispatchEvent(
+					window.Event.new("change")
+				)
+				editItemDialog.select(
+					"#weaponType" + weaponTypeTranslator[
+						data["inventory"][item]["weapon"]["kind"]
+					]
+				)[0].checked = True
+				editItemDialog.select(
+					"#damageType" + \
+						data["inventory"][item]["weapon"]["damage"]["type"][0].upper()
+				)[0].checked = True
+				for k in ("count", "value", "bonus"):
+					editItemDialog.select("#dmg" + k.capitalize())[0].value = \
+						data["inventory"][item]["weapon"]["damage"][k]				
+		else:
+			for k in ("count", "weight"):
+				editItemDialog.select('#' + k)[0].value = 0
+			for coin in coins:
+				editItemDialog.select('#' + coin)[0].value = 0
+			editItemDialog.select("#weaponTypeSM")[0].checked = True
+			editItemDialog.select("#damageTypeB")[0].checked = True
+			for i in ("#dmgDiceCount", "#dmgDiceValue", "#dmgBonus"):
+				editItemDialog.select(i)[0].value = 0
+
+		def okHandler(event):
+			print("Foo")
+
+		editItemDialog.ok_button.bind("click", okHandler)
+
+document["Create Item``New"].bind("click", adjustItem)
 
 def makeDamageString(damageDict : dict) -> str:
 	return str(damageDict["count"]) + 'd' + str(damageDict["die"]) \
@@ -913,7 +969,7 @@ def updateItemsTable():
 		)
 		row <= itemValueCell
 
-		if data["inventory"][k]["weapon"]["kind"] != "none":
+		if "weapon" in data["inventory"][k].keys():
 			row <= html.TD(data["inventory"][k]["weapon"]["kind"])
 			row <= html.TD(
 				makeDamageString(data["inventory"][k]["weapon"]["damage"])

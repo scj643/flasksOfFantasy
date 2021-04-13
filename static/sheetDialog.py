@@ -194,14 +194,14 @@ def itemEdit(item : str) -> dialog.Dialog:
 	d.panel <= html.BR()
 
 	d.panel <= html.P("Damage Values")
-	d.panel <= html.LABEL("Damage Dice Count:", For = "dmgDiceCount")
+	d.panel <= html.LABEL("Damage Dice Count:", For = "dmgCount")
 	d.panel <= html.INPUT(
-		id = "dmgDiceCount", Class = "weapon",
+		id = "dmgCount", Class = "weapon",
 		type = "number", min = 0, readonly = ''
 	)
-	d.panel <= html.LABEL("Damage Dice Value:", For = "dmgDiceValue")
+	d.panel <= html.LABEL("Damage Dice Value:", For = "dmgValue")
 	d.panel <= html.INPUT(
-		id = "dmgDiceValue", Class = "weapon",
+		id = "dmgValue", Class = "weapon",
 		type = "number", min = 0, readonly = ''
 	)
 	d.panel <= html.BR()
@@ -210,6 +210,8 @@ def itemEdit(item : str) -> dialog.Dialog:
 		id = "dmgBonus", Class = "weapon",
 		type = "number", min = 0, readonly = ''
 	)
+
+	return d
 	
 def listEntryDelete(item : str, itemType : str) -> dialog.Dialog:
 	d = dialog.Dialog("Confirm Deletion", ok_cancel = ("Yes", "No"))
