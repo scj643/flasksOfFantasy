@@ -160,7 +160,9 @@
 				</div>
 
 				<div id = "currency" class = "minorGroup">
-					<h3>Currency</h3>
+					<h3>Currency ({{"\u20B2"}})</h3>
+					<label for = "currencyTotal">Total</label>
+					<input id = "currencyTotal" readonly>
 					<label for = "currencyEdit">Edit Currency</label>
 					<input id = "currencyEdit" type = "checkbox">
 					{% for coin in coins %}
@@ -170,7 +172,7 @@
 					{% if coin == "gold" %}
 					<input id = "{{coin}}" class = "currency" type = "number" min = "0" readonly>
 					{% else %}
-					<input id = "{{coin}}" class = "currency" type = "number" min = "0" max = "100" readonly>
+					<input id = "{{coin}}" class = "currency" type = "number" min = "0" max = "10" readonly>
 					{% endif %}
 					<!--<input id = "{{coin}}`Increment" class = "currencyButton" type = "button" value = "+" disabled> -->
 					{% endfor %}

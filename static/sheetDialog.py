@@ -110,6 +110,107 @@ def featureEdit(feature : str) -> dialog.Dialog:
 
 	return d
 
+def itemEdit(item : str) -> dialog.Dialog:
+	d = dialog.Dialog(item, ok_cancel = True)
+	def toggleWeapon(event):
+		for i in d.select(".weapon"):
+			if i.type == "radio":
+				if event.target.checked:
+					del i.attrs["disabled"]
+				else:
+					i.attrs["disabled"] = ''
+			elif i.type == "number":
+				if event.target.checked:
+					del i.attrs["readonly"]
+				else:
+					i.attrs["readonly"] = ''
+
+	d.panel <= html.LABEL("Item Name:", For = "name")
+	d.panel <= html.INPUT(id = "name")
+	d.panel <= html.LABEL("Item Description:", For = "desc")
+	d.panel <= html.INPUT(id = "description")
+	d.panel <= html.BR()
+	d.panel <= html.LABEL("Item Count:", For = "count")
+	d.panel <= html.INPUT(id = "count", type = "number", min = 0)
+	d.panel <= html.LABEL("Item Weight:", For = "weight")
+	d.panel <= html.INPUT(id = "weight", type = "number", min = 0, step = 0.01)
+	d.panel <= html.BR()
+
+	d.panel <= html.P("Value")
+	d.panel <= html.LABEL("Gold:", For = "gold")
+	d.panel <= html.INPUT(id = "gold", type = "number", min = 0)
+	d.panel <= html.LABEL("Silver:", For = "silver")
+	d.panel <= html.INPUT(id = "silver", type = "number", min = 0, max = 10)
+	d.panel <= html.LABEL("Copper:", For = "copper")
+	d.panel <= html.INPUT(id = "copper", type = "number", min = 0, max = 10)
+	d.panel <= html.BR()
+
+	weaponTitleTag = html.P("Weapon")
+	weaponCheck = html.INPUT(id = "weaponCheck", type = "checkbox")
+	weaponCheck.bind("change", toggleWeapon)
+	weaponTitleTag <= weaponCheck
+	weaponTitleTag <= html.LABEL("Is Weapon?", For = "weaponCheck")
+	d.panel <= weaponTitleTag
+
+	d.panel <= html.P("Kind")
+	d.panel <= html.INPUT(
+		id = "weaponTypeSM", Class = "weapon", type = "radio",
+		name = "kind", value = "simpleMelee", disabled = ''
+	)
+	d.panel <= html.LABEL("Simple Melee", For = "weaponTypeSM")
+	d.panel <= html.INPUT(
+		id = "weaponTypeSR", Class = "weapon", type = "radio",
+		name = "kind", value = "simpleRanged", disabled = ''
+	)
+	d.panel <= html.LABEL("Simple Ranged", For = "weaponTypeSR")
+	d.panel <= html.INPUT(
+		id = "weaponTypeMM", Class = "weapon", type = "radio",
+		name = "kind", value = "martialMelee", disabled = ''
+	)
+	d.panel <= html.LABEL("Martial Melee", For = "weaponTypeMM")
+	d.panel <= html.INPUT(
+		id = "weaponTypeMR", Class = "weapon", type = "radio",
+		name = "kind", value = "martialRanged", disabled = ''
+	)
+	d.panel <= html.LABEL("Martial Ranged", For = "weaponTypeMR")
+	d.panel <= html.BR()
+
+	d.panel <= html.P("Damage Type")
+	d.panel <= html.INPUT(
+		id = "damageTypeB", Class = "weapon", type = "radio",
+		name = "type", value = "bludgeoning", disabled = ''
+	)
+	d.panel <= html.LABEL("Bludgeoning", For = "damageTypeB")
+	d.panel <= html.INPUT(
+		id = "damageTypeP", Class = "weapon", type = "radio",
+		name = "type", value = "piercing", disabled = ''
+	)
+	d.panel <= html.LABEL("Piercing", For = "damageTypeP")
+	d.panel <= html.INPUT(
+		id = "damageTypeS", Class = "weapon", type = "radio",
+		name = "type", value = "slashing", disabled = ''
+	)
+	d.panel <= html.LABEL("Slashing", For = "damageTypeS")
+	d.panel <= html.BR()
+
+	d.panel <= html.P("Damage Values")
+	d.panel <= html.LABEL("Damage Dice Count:", For = "dmgDiceCount")
+	d.panel <= html.INPUT(
+		id = "dmgDiceCount", Class = "weapon",
+		type = "number", min = 0, readonly = ''
+	)
+	d.panel <= html.LABEL("Damage Dice Value:", For = "dmgDiceValue")
+	d.panel <= html.INPUT(
+		id = "dmgDiceValue", Class = "weapon",
+		type = "number", min = 0, readonly = ''
+	)
+	d.panel <= html.BR()
+	d.panel <= html.LABEL("Damage Bonus:", For = "dmgBonus")
+	d.panel <= html.INPUT(
+		id = "dmgBonus", Class = "weapon",
+		type = "number", min = 0, readonly = ''
+	)
+	
 def listEntryDelete(item : str, itemType : str) -> dialog.Dialog:
 	d = dialog.Dialog("Confirm Deletion", ok_cancel = ("Yes", "No"))
 

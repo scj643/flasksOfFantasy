@@ -20,6 +20,7 @@ abilityTranslator = {
 	"cha": "charisma"
 }
 coins = ("gold", "silver", "copper")
+goldPieceSign = "\u20B2"
 levelsAndEXPRequired = {
 	1: 0,
 	2: 300,
@@ -553,6 +554,17 @@ for r in document.select("input[name=\"armor\"]"):
 # CURRENCY FUNCTIONS
 document["currencyEdit"].bind("change", lambda e : toggleEditing(e, "currency"))
 
+def makeCoinString(coinDict : dict) -> str:
+	return '.'.join(
+		[
+			goldPieceSign + str(coinDict["gold"]),
+			str(coinDict["silver"]) + str(coinDict["copper"])
+		]
+	)
+
+def refreshCurrencyTotal():
+	document["currencyTotal"].value = makeCoinString(data["currency"])
+
 def exchangeCoins(event):
 	try:
 		amount = int(event.target.value)
@@ -565,9 +577,8 @@ def exchangeCoins(event):
 
 	data["currency"][event.target.id] = int(event.target.value)
 
-	if event.target.id == "gold":
-		return
-	elif amount < 100:
+	if event.target.id == "gold" or amount < 10:
+		refreshCurrencyTotal()
 		return
 	else:
 		event.target.value = 0
@@ -575,14 +586,14 @@ def exchangeCoins(event):
 	if event.target.id == "silver":
 		data["currency"]["silver"] = 0
 		data["currency"]["gold"] += 1
-		reloadValues()
 	elif event.target.id == "copper":
 		data["currency"]["copper"] = 0
 		data["currency"]["silver"] += 1
-		if data["currency"]["silver"] == 100:
+		if data["currency"]["silver"] == 10:
 			data["currency"]["silver"] = 0
 			data["currency"]["gold"] += 1
-		reloadValues()
+	
+	reloadValues()
 
 document["gold"].bind("input", exchangeCoins)
 document["silver"].bind("input", exchangeCoins)
@@ -860,6 +871,76 @@ def updateFeaturesTable():
 
 		document["features"] <= row
 
+# INVENTORY FUNCTIONS
+def adjustItem(event):
+	editItemDialog = itemEdit("foo")
+
+def makeDamageString(damageDict : dict) -> str:
+	return str(damageDict["count"]) + 'd' + str(damageDict["die"]) \
+		+ " + " + str(damageDict["bonus"]) + ' ' + damageDict["type"] \
+		+ " (" + str(damageDict["count"] + damageDict["bonus"]) + '-' \
+		+ str(damageDict["count"] * damageDict["die"] + damageDict["bonus"]) + ')'
+
+def updateItemsTable():
+	for row in document.select("tr.itemRow"):
+		del document[row.id]
+	for k in sorted(data["inventory"].keys()):
+		inputID = k + "`Item"
+		row = html.TR(id = inputID + "`Row", Class = "itemRow")
+		row <= html.TD(k)
+		row <= html.TD(data["inventory"][k]["description"])
+
+		itemCountCell = html.TD()
+		itemCountCell <= html.INPUT(
+			id = inputID + "`Count", Class = "itemNumericCell",
+			value = data["inventory"][k]["count"],
+			type = "number", min = 0, readonly = ''
+		)
+		row <= itemCountCell
+
+		itemWeightCell = html.TD()
+		itemWeightCell <= html.INPUT(
+			id = inputID + "`Weight", Class = "itemNumericCell",
+			value = data["inventory"][k]["weight"],
+			type = "number", min = 0, step = 0.01, readonly = ''
+		)
+		row <= itemWeightCell
+
+		itemValueCell = html.TD()
+		itemValueCell <= html.INPUT(
+			id = inputID + "`Value", readonly = '',
+			value = makeCoinString(data["inventory"][k]["value"]),
+		)
+		row <= itemValueCell
+
+		if data["inventory"][k]["weapon"]["kind"] != "none":
+			row <= html.TD(data["inventory"][k]["weapon"]["kind"])
+			row <= html.TD(
+				makeDamageString(data["inventory"][k]["weapon"]["damage"])
+			)
+		else:
+			row <= html.TD(colspan = 2)
+
+		itemSettingsCell = html.TD()
+
+		itemEditButton = html.INPUT(
+			id = inputID + "`Edit", Class = "itemButton",
+			type = "button", value = "Edit",
+		)
+		itemEditButton.bind("click", adjustItem)
+		itemSettingsCell <= itemEditButton
+		
+		itemDeleteButton = html.INPUT(
+			id = inputID + "`Delete", Class = "itemButton",
+			type = "button", value = "Delete",
+		)
+		itemDeleteButton.bind("click", adjustItem)
+		itemSettingsCell <= itemDeleteButton
+
+		row <= itemSettingsCell
+
+		document["items"] <= row
+
 # GENERAL/NETWORK/OTHER FUNCTIONS
 def reloadValues():
 	global data
@@ -923,6 +1004,7 @@ def reloadValues():
 			break
 	#refreshArmorDisplay()
 
+	refreshCurrencyTotal()
 	for coin in coins:
 		document[coin].value = data["currency"][coin]
 
@@ -933,6 +1015,8 @@ def reloadValues():
 	updateSkillsTable()
 
 	updateFeaturesTable()
+
+	updateItemsTable()
 
 def jsonHandler(response):
 	global data
