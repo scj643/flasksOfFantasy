@@ -93,7 +93,7 @@ def logout():
 	return fl.redirect(fl.url_for("login"))
 
 def staticCahcingCheck(script):
-	noCacheList = ["common.py", "sheetDialog.py"]
+	noCacheList = ["common.py", "sheetDialog.py", "sheetDefault.css"]
 	print(script)
 	if script in noCacheList:
 		fl.after_this_request(noCaching)

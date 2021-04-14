@@ -3,6 +3,7 @@
 	<head>
 		<script src = {{url_for("static", filename = "brython/brython.js")}}></script>
 		<script src = {{url_for("static", filename = "brython/brython_stdlib.js")}}></script>
+		<link rel = "stylesheet" href = {{url_for("static", filename = "sheetDefault.css")}}>
 		<meta charset = "utf-8">
 		<meta id = "sheetName" content = "{{sheetName}}">
 		<meta id = "foo" content = "bar">
@@ -12,8 +13,11 @@
 		<script type = "text/python" src = {{url_for("static", filename = "sheet.py")}}></script>
 
 		<div id = "border">
-			<label for = "save">Save Sheet</label>
-			<input type = "button" id = "save" value = "Save">
+			<h1>{{sheetName}}</h1>
+			<div id = "controls" class = "majorGroup">
+				<label for = "save">Save Sheet</label>
+				<input type = "button" id = "save" value = "Save">
+			</div>
 
 			<div id = "biography" class = "majorGroup">
 				<h2>Biography</h2>
@@ -31,7 +35,7 @@
 
 					<label for = "class">Class</label>
 					<input id = "class" class = "bio" readonly>
-					<input id = "classEdit" class = "bio" type = "button" value = "Edit Class(es)" readonly>
+					<input id = "classEdit" class = "bio" type = "button" value = "Edit Class(es)" disabled>
 					<label for = "alignment">Alignment</label>
 					<input id = "alignment" class = "bio" readonly>
 				</div>
@@ -44,7 +48,7 @@
 					<label for = "eyeColor">Eye Color</label>
 					<input id = "eyeColor" class = "bio" readonly>
 					<label for = "hairColor">Hair Color</label>
-					<input id = "hairColor" class = "bio" readonly>
+					<input id = "hairColor" class = "bio" readonly> <br>
 
 					<label for = "size">Size</label>
 					<input id = "size" class = "bio" readonly>
@@ -60,14 +64,14 @@
 				<label for = "abilitiesEdit">Edit Ability Scores</label>
 				<input id = "abilitiesEdit" type = "checkbox">
 				{% for ability in abilities %}
-				<div class = "minorGroup">
+				<div class = "abilityDiv">
 					<label for = "{{ability}}"><h3>{{ability|capitalize}}</h3></label>
-					<input id = "{{ability}}`Set" class = "abilityButton" type = "button" value = "Set" disabled>
 					<input id = "{{ability}}`Decrement" class = "abilityButton" type = "button" value = "-" disabled>
 					<input id = "{{ability}}" class = "ability" readonly> <!--type = "number" min = 1 max = 30-->
 					<input id = "{{ability}}`Increment" class = "abilityButton" type = "button" value = "+" disabled>
 					<label for = "{{ability}}Bonus">Bonus</label>
 					<input id = "{{ability}}Bonus" class = "abilityBonus" readonly>
+					<input id = "{{ability}}`Set" class = "abilityButton" type = "button" value = "Set" disabled>
 				</div>
 
 				{% endfor %}
@@ -78,12 +82,12 @@
 				<div id = "hit" class = "minorGroup">
 					<h3>Hit Points</h3>
 					<label for = "hitEdit">Edit Hit Points</label>
-					<input id = "hitEdit" type = "checkbox">
+					<input id = "hitEdit" type = "checkbox"> <br>
 					<label for = "currentHit">Current Hit Points</label>
 					<!--<input id = "currentHit`Decrement" class = "hitButton" type = "button" value = "-" disabled>-->
 					<input id = "currentHit`Value" class = "hit" type = "number" readonly>
 					<!--<input id = "currentHit`Increment" class = "hitButton" type = "button" value = "+" disabled>-->
-					<input id = "currentHit`Set" class = "hitButton" type = "button" value = "Set" disabled>
+					<input id = "currentHit`Set" class = "hitButton" type = "button" value = "Set" disabled> <br>
 
 					<label for = "maxHit">Maximum Hit Points</label>
 					<input id = "maxHit" class = "hit" readonly>
@@ -111,8 +115,16 @@
 					</div>
 				</div>
 
-				<div id = "exeperience" class = "minorGroup">
-					<h3>Experience</h3>
+				<div id = "experience" class = "minorGroup">
+					<h3>Experience</h3>	
+					<input id = "experience`Add" type = "button" value = "Add">
+					<input id = "experience`Edit", type = "button" value = "Edit"> <br>
+					<label for = "currentExperience">Experience Points</label>
+					<input id = "currentExperience" class = "experience" readonly> <br>
+					
+					<label for = "nextExperience">Needed for Next Level</label>
+					<input id = "nextExperience" class = "experience" readonly>
+
 					<label for = "characterLevel"><h4>Character Level</h4></label>
 					<input id = "characterLevel" class = "experience" readonly>
 					<input id = "characterLevelSet" type = "button" value = "Set Character Level">
@@ -121,14 +133,6 @@
 						<h4>Class Level(s)</h4>
 						<input id = "classLevelsEdit" type = "button" value = "Edit Class Levels">
 					</div>
-					
-					<label for = "currentExperience">Experience Points</label>
-					<input id = "currentExperience" class = "experience" readonly>
-					<input id = "experience`Add" type = "button" value = "Add">
-					<input id = "experience`Edit", type = "button" value = "Edit">
-					
-					<label for = "nextExperience">Needed for Next Level</label>
-					<input id = "nextExperience" class = "experience" readonly>
 				</div>
 
 				<div id = "armorDiv" class = "minorGroup">
@@ -164,7 +168,7 @@
 					<label for = "currencyTotal">Total</label>
 					<input id = "currencyTotal" readonly>
 					<label for = "currencyEdit">Edit Currency</label>
-					<input id = "currencyEdit" type = "checkbox">
+					<input id = "currencyEdit" type = "checkbox"> <br>
 					{% for coin in coins %}
 					<label for = "{{coin}}">{{coin|capitalize}}</label>
 					<!--<input id = "{{coin}}`Set" class = "currencyButton" type = "button" value = "Set" disabled>-->
@@ -174,6 +178,7 @@
 					{% else %}
 					<input id = "{{coin}}" class = "currency" type = "number" min = "0" max = "10" readonly>
 					{% endif %}
+					<br>
 					<!--<input id = "{{coin}}`Increment" class = "currencyButton" type = "button" value = "+" disabled> -->
 					{% endfor %}
 					<!--<input id = "currencySet" class = "currencyButton" type = "button" value = "Set All" disabled>-->

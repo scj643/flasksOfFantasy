@@ -63,9 +63,15 @@ def toggleEditing(event, group):
 				window.Event.new("change")
 			)
 		if event.target.checked:
-			del field.attrs["readonly"]
+			if field.type == "button":
+				del field.attrs["disabled"]
+			else:
+				del field.attrs["readonly"]
 		else:
-			field.attrs["readonly"] = ''
+			if field.type == "button":
+				field.attrs["disabled"] = ''
+			else:
+				field.attrs["readonly"] = ''
 	#print(data["biography"])
 
 def setBioData(event):
@@ -263,7 +269,7 @@ def updateHitDiceDivs():
 	for k in sorted(data["hit"]["dice"].keys()):
 		inputID = k + "`HitDice"
 		div = html.DIV(id = inputID + "Div", Class = "hitDiceDiv")
-		div <= html.LABEL(k, For = inputID)
+		div <= html.LABEL(k + ": ", For = inputID)
 		div <= html.INPUT(
 			id = inputID, value = makeDieString(
 				data["hit"]["dice"][k]["count"],
@@ -482,7 +488,7 @@ def updateClassLevelDivs():
 	for k in sorted(data["experience"]["level"]["classes"].keys()):
 		inputID = k + "`ClassLevel"
 		div = html.DIV(id = inputID + "Div", Class = "classLevelDiv")
-		div <= html.LABEL(k, For = inputID)
+		div <= html.LABEL(k + ": ", For = inputID)
 		div <= html.INPUT(
 			id = inputID,
 			value = data["experience"]["level"]["classes"][k],

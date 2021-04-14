@@ -1,0 +1,151 @@
+@font-face {
+	src: url(/static/3270-Regular.woff);
+	font-family: ibm;
+}
+
+@font-face {
+	src: url(/static/FantasqueSansMono-Regular.woff);
+	font-family: fantasque;
+}
+
+body {
+	background-color: linen;
+	font-family: fantasque;
+}
+
+div {
+	border: 4px outset tan;
+	margin: 8px;
+}
+
+.minorGroup {
+	padding: 4px;
+}
+
+input {
+	width: 100px;
+	font-family: ibm;
+	font-size: 14pt;
+	font-weight: bold;
+}
+
+.bio {
+	width: auto;
+}
+
+input[type = "button"], input[type = "checkbox"], input[type = "radio"]{
+/*	font-size: 12pt;*/
+	width: auto;
+}
+
+#save {
+	width: 80px;
+	grid-column-start: 2;
+}
+
+.ability, .abilityBonus {
+	height: 36pt;
+	width: 60px;
+}
+
+.hit, #characterLevel {
+	height: 48pt;
+	width: 120px;
+}
+
+#currentExperience, #nextExperience {
+	width: 240px;
+}
+
+.classLevelDiv, .hitDiceDiv, #successes, #failures {
+	width: 50%;
+	text-align: center;
+}
+
+#currencyTotal {
+	height: 36pt;
+	width: 240px;
+}
+
+.currency {
+	width: 160px;
+}
+
+#border {
+	display: grid;
+	width: 90%;
+	margin: auto;
+}
+
+#controls {
+	text-align: center;
+	grid-row-start: 1;
+	grid-column-start: 2;
+}
+
+#biography {
+	grid-row-start: 2;
+	grid-column: 1 / span 3;
+}
+
+#abilities {
+	grid-row-start: 3;
+	grid-column: 1 / span 2;
+}
+
+.abilityDiv {
+	text-align: center;
+	margin: 4px auto 4px auto;
+	width: 66%;
+}
+
+#statistics {
+	grid-row: 3 / span 2;
+	grid-column-start: 3;
+	display: grid;
+}
+
+#hit {
+	grid-row: 2 / span 2;
+	grid-column-start: 1;
+}
+
+#hitDice, #deathSaves, #classLevels {
+	padding: 4px;
+}
+
+#experience {
+	grid-row-start: 2;
+	grid-column-start: 2;
+}
+
+#armorDiv {
+	grid-row: 4 / span 2;
+	grid-column-start: 1;
+}
+
+#currency {
+	text-align: center;
+	grid-row: 3 / span 2;
+	grid-column-start: 2;
+}
+
+#skillsDiv {
+	grid-row: 4 / span 2;
+	grid-column: 1  / span 2;
+}
+
+#featuresDiv {
+	grid-row: 5 / span 2;
+	grid-column-start: 3;
+}
+
+#itemsDiv {
+	grid-row-start: 7;
+	grid-column: 1 / span 3;
+}
+
+#spellsDiv {
+	grid-row-start: 8;
+	grid-column: 1 / span 3;
+}
