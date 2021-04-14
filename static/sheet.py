@@ -685,7 +685,7 @@ def updateSkillsTable():
 		ability = data["proficiency"]["skills"][k]
 		row = html.TR(id = inputID + "`Row", Class = "skillRow")
 
-		row <= html.TD(html.H4(k))
+		row <= html.TD(html.H4(k), Class = "skillName")
 
 		row <= html.TD(html.B(ability.upper()))
 
@@ -828,8 +828,8 @@ def updateFeaturesTable():
 	for k in sorted(data["features"].keys()):
 		inputID = k + "`Feature"
 		row = html.TR(id = inputID + "`Row", Class = "featureRow")
-		row <= html.TD(html.H3(k))
-		row <= html.TD(data["features"][k]["description"])
+		row <= html.TD(html.H3(k), Class = "featureName")
+		row <= html.TD(data["features"][k]["description"], Class = "featureDesc")
 
 		numericCell = html.TD()
 		if data["features"][k]["type"] == "numeric":
@@ -1107,8 +1107,8 @@ def updateItemsTable():
 	for k in sorted(data["inventory"].keys()):
 		inputID = k + "`Item"
 		row = html.TR(id = inputID + "`Row", Class = "itemRow")
-		row <= html.TD(html.H3(k))
-		row <= html.TD(data["inventory"][k]["description"])
+		row <= html.TD(html.H3(k), Class = "itemName")
+		row <= html.TD(data["inventory"][k]["description"], Class = "itemDesc")
 
 		itemCountCell = html.TD()
 		itemCountCell <= html.INPUT(

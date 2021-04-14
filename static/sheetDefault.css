@@ -15,11 +15,54 @@ body {
 
 div {
 	border: 4px outset tan;
+	border-radius: 4px;
 	margin: 8px;
 }
 
 .minorGroup {
+	border-style: inset;
 	padding: 4px;
+}
+
+table.minorGroup {
+	border-style: hidden;
+}
+
+table {
+	width: 100%;
+}
+
+th {
+	border-style: hidden dotted dotted dotted;
+	border-width: 4px;
+	border-color: tan;
+}
+
+td {
+	padding-left: 4px;
+	border-style: hidden dotted dotted dotted;
+	border-width: 0px 2px 1px 2px;
+	border-color: tan;
+}
+
+td.skillName {
+	width: 35%;
+}
+
+td.featureName {
+	width: 25%;
+}
+
+td.featureDesc {
+	width: 35%;
+}
+
+td.itemName {
+	width: 15%;
+}
+
+td.itemDesc {
+	width: 30%;
 }
 
 input {
@@ -34,8 +77,11 @@ input {
 }
 
 input[type = "button"], input[type = "checkbox"], input[type = "radio"]{
-/*	font-size: 12pt;*/
 	width: auto;
+}
+
+input#description {
+	width: 360px;
 }
 
 #save {
@@ -73,8 +119,9 @@ input[type = "button"], input[type = "checkbox"], input[type = "radio"]{
 
 #border {
 	display: grid;
-	width: 90%;
+	width: 95%;
 	margin: auto;
+	grid-template-columns: 25% 15% 60% 0%;
 }
 
 #controls {
@@ -85,7 +132,7 @@ input[type = "button"], input[type = "checkbox"], input[type = "radio"]{
 
 #biography {
 	grid-row-start: 2;
-	grid-column: 1 / span 3;
+	grid-column: 1 / span 4;
 }
 
 #abilities {
@@ -101,7 +148,7 @@ input[type = "button"], input[type = "checkbox"], input[type = "radio"]{
 
 #statistics {
 	grid-row: 3 / span 2;
-	grid-column-start: 3;
+	grid-column: 3 / span 2;
 	display: grid;
 }
 
@@ -110,7 +157,7 @@ input[type = "button"], input[type = "checkbox"], input[type = "radio"]{
 	grid-column-start: 1;
 }
 
-#hitDice, #deathSaves, #classLevels {
+#hitDice, #deathSaves, #classLevels, #skillsDiv, #featuresDiv, #itemsDiv, #spellsDiv{
 	padding: 4px;
 }
 
@@ -137,15 +184,15 @@ input[type = "button"], input[type = "checkbox"], input[type = "radio"]{
 
 #featuresDiv {
 	grid-row: 5 / span 2;
-	grid-column-start: 3;
+	grid-column: 3 / span 2;
 }
 
 #itemsDiv {
 	grid-row-start: 7;
-	grid-column: 1 / span 3;
+	grid-column: 1 / span 4;
 }
 
 #spellsDiv {
 	grid-row-start: 8;
-	grid-column: 1 / span 3;
+	grid-column: 1 / span 4;
 }
