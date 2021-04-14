@@ -105,6 +105,8 @@ defaultSheet = {
 				"kind": "none",
 				"damage": {
 					"type": "none",
+					"ability": "str",
+					"proficient": False,
 					"die": 0,
 					"count": 0,
 					"bonus": 0

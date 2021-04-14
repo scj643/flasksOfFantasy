@@ -114,7 +114,7 @@ def itemEdit(item : str) -> dialog.Dialog:
 	d = dialog.Dialog(item, ok_cancel = True)
 	def toggleWeapon(event):
 		for i in d.select(".weapon"):
-			if i.type == "radio":
+			if i.type == "radio" or i.type == "checkbox":
 				if event.target.checked:
 					del i.attrs["disabled"]
 				else:
@@ -191,7 +191,24 @@ def itemEdit(item : str) -> dialog.Dialog:
 		name = "type", value = "slashing", disabled = ''
 	)
 	d.panel <= html.LABEL("Slashing", For = "damageTypeS")
+	d.panel <= html.INPUT(
+		id = "isProficient", Class = "weapon",
+		type = "checkbox", disabled = ''
+	)
+	d.panel <= html.LABEL("Proficient?", For = "isProficient")
+	d.panel <= html.INPUT(
+		id = "bonusFromSTR", Class = "weapon", type = "radio",
+		name = "ability", value = "str", disabled = ''
+	)
+	d.panel <= html.LABEL("Strength (Melee*)", For = "bonusFromSTR")
+	d.panel <= html.INPUT(
+		id = "bonusFromDEX", Class = "weapon", type = "radio",
+		name = "ability", value = "dex", disabled = ''
+	)
+	d.panel <= html.LABEL("Dexterity (Ranged*)", For = "bonusFromDEX")
 	d.panel <= html.BR()
+
+	d.panel <= html.P("* Finesse weapons can derive from either ability per player choice")
 
 	d.panel <= html.P("Damage Values")
 	d.panel <= html.LABEL("Damage Dice Count:", For = "dmgCount")

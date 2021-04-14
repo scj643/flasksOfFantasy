@@ -184,6 +184,7 @@ def syncAbilityScore(ability : str, newValue : int):
 	document[ability + "Bonus"].value = newBonus
 
 	refreshArmorDisplay()
+	updateItemsTable()
 
 def adjustAbilityScore(event):
 	ability = event.target.id.split('`')[0]
@@ -678,12 +679,9 @@ def updateSkillsTable():
 		ability = data["proficiency"]["skills"][k]
 		row = html.TR(id = inputID + "`Row", Class = "skillRow")
 
-		row <= html.TD(k)
+		row <= html.TD(html.H4(k))
 
-		skillData = html.TD()
-		skillBold = html.B(ability.upper())
-		skillData <= skillBold
-		row <= skillData
+		row <= html.TD(html.B(ability.upper()))
 
 		skillData = html.TD()
 		skillValue = html.INPUT(
@@ -824,7 +822,7 @@ def updateFeaturesTable():
 	for k in sorted(data["features"].keys()):
 		inputID = k + "`Feature"
 		row = html.TR(id = inputID + "`Row", Class = "featureRow")
-		row <= html.TD(k)
+		row <= html.TD(html.H3(k))
 		row <= html.TD(data["features"][k]["description"])
 
 		numericCell = html.TD()
@@ -881,7 +879,37 @@ def adjustItem(event):
 		creatingItem = True
 		method = "Edit"
 
-	if method == "Edit":
+	if method in ("Count", "Weight"):
+		try:
+			if method == "Count":
+				data["inventory"][item]["count"] = int(
+					document[item + "`Item`Count"].value
+				)
+			else:
+				data["inventory"][item]["weight"] = float(
+					document[item + "`Item`Weight"].value
+				)
+
+			document["totalWeight"].value = calculateTotalWeight()
+		except ValueError:
+			dialog.InfoDialog(
+				"Item " + method + " Error",
+				"Please only enter " \
+					+ ("integers " if method == "Count" else "floats ") \
+					+ "in the " + method.lower() + " field."
+			)
+
+	elif method == "Delete":
+		deleteItemDialog = listEntryDelete(item, "item")
+
+		def deleteHandler(event):
+			del data["inventory"][item]
+			deleteItemDialog.close()
+			updateItemsTable()
+
+		deleteItemDialog.ok_button.bind("click", deleteHandler)
+
+	elif method == "Edit":
 		weaponTypeTranslator = {
 			"simpleMelee": "SM",
 			"simpleRanged": "SR",
@@ -902,21 +930,33 @@ def adjustItem(event):
 				editItemDialog.select("#weaponCheck")[0].dispatchEvent(
 					window.Event.new("change")
 				)
+
 				editItemDialog.select(
 					"#weaponType" + weaponTypeTranslator[
 						data["inventory"][item]["weapon"]["kind"]
 					]
 				)[0].checked = True
+
 				editItemDialog.select(
 					"#damageType" + \
 						data["inventory"][item]["weapon"]["damage"]["type"][0].upper()
 				)[0].checked = True
+
+				editItemDialog.select("#isProficient")[0].checked = \
+					data["inventory"][item]["weapon"]["damage"]["proficient"]
+
+				editItemDialog.select(
+					"#bonusFrom" + \
+						data["inventory"][item]["weapon"]["damage"]["ability"].upper()
+				)[0].checked = True
+
 				for k in ("count", "die", "bonus"):
 					editItemDialog.select("#dmg" + k.capitalize())[0].value = \
 						data["inventory"][item]["weapon"]["damage"][k]
 			else:
 				editItemDialog.select("#weaponTypeSM")[0].checked = True
 				editItemDialog.select("#damageTypeB")[0].checked = True
+				editItemDialog.select("#bonusFromSTR")[0].checked = True
 				for i in ("#dmgCount", "#dmgDie", "#dmgBonus"):
 					editItemDialog.select(i)[0].value = 0
 
@@ -927,6 +967,7 @@ def adjustItem(event):
 				editItemDialog.select('#' + coin)[0].value = 0
 			editItemDialog.select("#weaponTypeSM")[0].checked = True
 			editItemDialog.select("#damageTypeB")[0].checked = True
+			editItemDialog.select("#bonusFromSTR")[0].checked = True
 			for i in ("#dmgCount", "#dmgDie", "#dmgBonus"):
 				editItemDialog.select(i)[0].value = 0
 
@@ -978,15 +1019,19 @@ def adjustItem(event):
 						)
 						return
 
-				newItemWeapon = {"damage": {}}
-				for name in ("kind", "type"):
+				newItemWeapon = {
+					"damage": {
+						"proficient": editItemDialog.select("#isProficient")[0].checked
+					}
+				}
+				for name in ("kind", "type", "ability"):
 					for r in editItemDialog.select(
 						"input[name = \"" + name + "\"]"
 					):
 						if r.checked:
 							if name == "kind":
 								newItemWeapon[name] = r.value
-							elif name == "type":
+							elif name == "type" or name == "ability":
 								newItemWeapon["damage"][name] = r.value
 							break
 				
@@ -1017,18 +1062,29 @@ def adjustItem(event):
 		editItemDialog.ok_button.bind("click", okHandler)
 
 document["Create Item``New"].bind("click", adjustItem)
+document["itemsEdit"].bind("change", lambda e : toggleEditing(e, "itemNumericCell"))
 
 def makeDamageString(damageDict : dict) -> str:
+	abilityKey = abilityTranslator[
+		damageDict["ability"]
+	]
+	bonus = data["abilities"][abilityKey]["bonus"] \
+		+ (data["proficiency"]["bonus"] if damageDict["proficient"] else 0) \
+		+ damageDict["bonus"]
+	
 	return str(damageDict["count"]) + 'd' + str(damageDict["die"]) \
-		+ " + " + str(damageDict["bonus"]) + ' ' + damageDict["type"] \
-		+ " (" + str(damageDict["count"] + damageDict["bonus"]) + '-' \
-		+ str(damageDict["count"] * damageDict["die"] + damageDict["bonus"]) + ')'
+		+ " + " + str(bonus) + ' ' + damageDict["type"] \
+		+ " (" + str(damageDict["count"] + bonus) + '-' \
+		+ str(damageDict["count"] * damageDict["die"] + bonus) + ')'
 
 def calculateTotalWeight() -> float:
-	return sum(
-		data["inventory"][i]["count"] *
-		data["inventory"][i]["weight"]
-		for i in data["inventory"].keys()
+	return round(
+		sum(
+			data["inventory"][i]["count"] *
+			data["inventory"][i]["weight"]
+			for i in data["inventory"].keys()
+		),
+		2
 	)
 
 def updateItemsTable():
@@ -1045,7 +1101,7 @@ def updateItemsTable():
 	for k in sorted(data["inventory"].keys()):
 		inputID = k + "`Item"
 		row = html.TR(id = inputID + "`Row", Class = "itemRow")
-		row <= html.TD(k)
+		row <= html.TD(html.H3(k))
 		row <= html.TD(data["inventory"][k]["description"])
 
 		itemCountCell = html.TD()
@@ -1054,6 +1110,7 @@ def updateItemsTable():
 			value = data["inventory"][k]["count"],
 			type = "number", min = 0, readonly = ''
 		)
+		itemCountCell.bind("input", adjustItem)
 		row <= itemCountCell
 
 		itemWeightCell = html.TD()
@@ -1062,6 +1119,7 @@ def updateItemsTable():
 			value = data["inventory"][k]["weight"],
 			type = "number", min = 0, step = 0.01, readonly = ''
 		)
+		itemWeightCell.bind("input", adjustItem)
 		row <= itemWeightCell
 
 		itemValueCell = html.TD()
