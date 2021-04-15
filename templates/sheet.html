@@ -43,18 +43,18 @@
 				<div id = "biographyCosmetic" class = "minorGroup">
 					<h3>Cosmetic Information</h3>
 
-					<label for = "gender">Gender</label>
+					<label for = "gender" class = "cosmetic">Gender</label>
 					<input id = "gender" class = "bio" readonly>
-					<label for = "eyeColor">Eye Color</label>
+					<label for = "eyeColor" class = "cosmetic">Eye Color</label>
 					<input id = "eyeColor" class = "bio" readonly>
-					<label for = "hairColor">Hair Color</label>
+					<label for = "hairColor" class = "cosmetic">Hair Color</label>
 					<input id = "hairColor" class = "bio" readonly> <br>
 
-					<label for = "size">Size</label>
+					<label for = "size" class = "cosmetic">Size</label>
 					<input id = "size" class = "bio" readonly>
-					<label for = "height">Height</label>
+					<label for = "height" class = "cosmetic">Height</label>
 					<input id = "height" class = "bio" readonly>
-					<label for = "weight">Weight</label>
+					<label for = "weight" class = "cosmetic">Weight</label>
 					<input id = "weight" class = "bio" readonly>
 					<input id = "wheightEdit" class = "bio" type = "button" value = "Edit Height/Weight" disabled>
 				</div>
@@ -179,7 +179,7 @@
 					{% else %}
 					<input id = "{{coin}}" class = "currency" type = "number" min = "0" max = "10" readonly>
 					{% endif %}
-					<br>
+					<!--<br>-->
 					<!--<input id = "{{coin}}`Increment" class = "currencyButton" type = "button" value = "+" disabled> -->
 					{% endfor %}
 					<!--<input id = "currencySet" class = "currencyButton" type = "button" value = "Set All" disabled>-->

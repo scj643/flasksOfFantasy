@@ -86,14 +86,14 @@ td.itemDesc {
 	width: 30%;
 }
 
-input {
+input, .brython-dialog-button {
 	width: 100px;
 	font-family: ibm;
 	font-size: 14pt;
 	font-weight: bold;
 }
 
-input[type = "button"], input[type = "checkbox"], input[type = "radio"]{
+input[type = "button"], input[type = "checkbox"], input[type = "radio"], .brython-dialog-button {
 	width: auto;
 }
 
@@ -140,11 +140,11 @@ input[type = "button"]:active:not([disabled]), .brython-dialog-button:active {
 	box-shadow: 0px 0px;
 }
 
-input.dialogName, #classList {
+input.dialogName, #classList, #class.bio {
 	width:240px;
 }
 
-input#description {
+input#description, #name.bio, #race.bio {
 	width: 360px;
 }
 
@@ -196,12 +196,12 @@ input#description {
 	background-color: peachpuff;
 	width: 80px;
 }
-
+/*
 #gold {
 	position: relative;
 	left: 8px;
 }
-
+*/
 #border {
 	display: grid;
 	width: 95%;
@@ -221,6 +221,32 @@ input#description {
 	grid-column: 1 / span 4;
 }
 
+.cosmetic {
+	display: inline-block;
+	width: 100px;
+	text-align: right;
+}
+/*
+#biographyCosmetic {
+	display: grid;
+}
+
+#gender, #size {
+	grid-column-start: 2;
+}
+
+#eyeColor, #height {
+	grid-column-start: 4;
+}
+
+#hairColor, #weight {
+	grid-column-start: 6;
+}
+
+#wheightEdit {
+	grid-column-start: 7;
+}
+*/
 #abilities {
 	grid-row-start: 3;
 	grid-column: 1 / span 2;
@@ -253,8 +279,16 @@ input#description {
 }
 
 #armorDiv {
-	grid-row: 4 / span 2;
-	grid-column-start: 1;
+	text-align: center;
+	grid-row-start 4;
+	grid-column: 1 / span 2;
+}
+
+#armorOptions {
+	text-align: left;
+	width: 40%;
+	margin: auto;
+	padding-left: %;
 }
 
 #currency {
@@ -269,16 +303,16 @@ input#description {
 }
 
 #featuresDiv {
-	grid-row: 5 / span 2;
+	grid-row: 5 / span 3;
 	grid-column: 3 / span 2;
 }
 
 #itemsDiv {
-	grid-row-start: 7;
+	grid-row-start: 8;
 	grid-column: 1 / span 4;
 }
 
 #spellsDiv {
-	grid-row-start: 8;
+	grid-row-start: 9;
 	grid-column: 1 / span 4;
 }

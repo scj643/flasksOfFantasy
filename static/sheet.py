@@ -92,7 +92,8 @@ def levelSyncCheck():
 		sum(data["experience"]["level"]["classes"].values()):
 		dialog.InfoDialog(
 			"Level Inequality Notice",
-			"The sum of your class level(s) is not equal to your character level. Please make sure to check this and resynchronize it manually."
+			"The sum of your class level(s) is not equal to your character level. Please make sure to check this and resynchronize it manually.",
+			remove_after = 8, default_css = False
 		)
 
 def adjustClass(event):
@@ -129,7 +130,8 @@ def adjustClass(event):
 		except ValueError:
 			dialog.InfoDialog(
 				"Value Error",
-				"Dice entries must be integers!"
+				"Dice entries must be integers!",
+				remove_after = 4, default_css = False
 			)
 			return
 		
@@ -138,20 +140,23 @@ def adjustClass(event):
 		except ValueError:
 			dialog.InfoDialog(
 				"Value Error",
-				"Level entries must be integers!"
+				"Level entries must be integers!",
+				remove_after = 4, default_css = False
 			)
 			return
 
 		if len(classList) != len(diceList):
 			dialog.InfoDialog(
 				"Mismatch Error",
-				"Number of classes not equal to number of dice!"
+				"Number of classes not equal to number of dice!",
+				remove_after = 4, default_css = False
 			)
 			return
 		elif len(classList) != len(levelList):
 			dialog.InfoDialog(
 				"Mismatch Error",
-				"Number of classes not equal to number of levels!"
+				"Number of classes not equal to number of levels!",
+				remove_after = 4, default_css = False
 			)
 			return
 		
@@ -197,12 +202,22 @@ def adjustWHeight(event):
 				editWHeightDialog.select("#measure")[0].value
 			)
 			if newMeasure < 0.0:
+				dialog.InfoDialog(
+					"Measure Error",
+					"Measure must be non-negative!",
+					remove_after = 4, default_css = False
+				)
 				return
 
 			data["biography"][field]["measure"] = newMeasure
 			data["biography"][field]["unit"] = \
 				editWHeightDialog.select("#unit")[0].value
 		except ValueError:
+			dialog.InfoDialog(
+				"Measure Error",
+				"Measure must be a number!",
+				remove_after = 4, default_css = False
+			)
 			return
 
 		editWHeightDialog.close()
@@ -246,7 +261,8 @@ def adjustAbilityScore(event):
 	elif function == "Set":
 		newValueDialog = dialog.EntryDialog(
 			"Set " + ability.capitalize(),
-			"Enter a score value between 1 and 30 inclusive"
+			"Enter a score value between 1 and 30 inclusive",
+			default_css = False
 		)
 		def entryHandler(e):
 			newValue = newValueDialog.value
@@ -259,12 +275,14 @@ def adjustAbilityScore(event):
 				else:
 					dialog.InfoDialog(
 						"Ability Set Error",
-						"Value out of range of 1 to 30!"
+						"Value out of range of 1 to 30!",
+						remove_after = 4, default_css = False
 					)
 			except ValueError:
 				dialog.InfoDialog(
 					"Ability Set Error",
-					"Could not parse value as integer!"
+					"Could not parse value as integer!",
+					remove_after = 4, default_css = False
 				)
 
 		newValueDialog.bind("entry", entryHandler)
@@ -371,14 +389,16 @@ def adjustHitPoints(event):
 		except ValueError:
 			dialog.InfoDialog(
 				"Hit Point Error",
-				"Please only enter integers in the current hit points field."
+				"Please only enter integers in the current hit points field.",
+				remove_after = 4, default_css = False
 			)
 			event.target.value = data["hit"]["current"]
 			return
 	elif method == "Set":	
 		newValueDialog = dialog.EntryDialog(
 			"Set " + fieldKeyword.capitalize() + " Hit Points",
-			"Enter a new " + fieldKeyword + " hit points value"
+			"Enter a new " + fieldKeyword + " hit points value",
+			default_css = False
 		)
 		def entryHandler(e):
 			newValue = newValueDialog.value
@@ -387,12 +407,14 @@ def adjustHitPoints(event):
 				if newValue < 1 and field == "maxHit":
 					dialog.InfoDialog(
 						"Hit Points Set Error",
-						"Max Hit Points Must Be Positive & Non-Zero!"
+						"Max Hit Points Must Be Positive & Non-Zero!",
+						remove_after = 4, default_css = False
 					)
 				elif newValue < -data["hit"]["max"]:
 					dialog.InfoDialog(
 						"Hit Point Set Error",
-						"Current Hit Points Cannot Fall That Far!"
+						"Current Hit Points Cannot Fall That Far!",
+						remove_after = 4, default_css = False
 					)
 				elif field == "maxHit" or field == "currentHit" \
 					and newValue <= data["hit"]["max"]:
@@ -401,12 +423,14 @@ def adjustHitPoints(event):
 				else:
 					dialog.InfoDialog(
 						"Hit Points Set Error",
-						"Current Hit Points Cannot Exceed Maximum!"
+						"Current Hit Points Cannot Exceed Maximum!",
+						remove_after = 4, default_css = False
 					)
 			except ValueError:
 				dialog.InfoDialog(
 					"Hit Points Set Error",
-					"Could not parse value as integer!"
+					"Could not parse value as integer!",
+					remove_after = 4, default_css = False
 				)
 
 		newValueDialog.bind("entry", entryHandler)
@@ -434,7 +458,8 @@ def processDeathSaves(event):
 				pass
 
 		else:
-			document[kind + '`' + str(count + 1)].attrs["disabled"] = ''
+			for c in range(count, 3):
+				document[kind + '`' + str(c + 1)].attrs["disabled"] = ''
 			for box in range(count + 1, 4):
 				document[kind + '`' + str(box)].checked = False
 			count -= 1
@@ -466,7 +491,10 @@ def setLevel(event):
 		try:
 			newCharacterLevel = int(levelSetDialog.select("#newCharLevel")[0].value)
 			if newCharacterLevel < 1 or newCharacterLevel > 20:
-				dialog.InfoDialog("Value Error", "Please enter a number from 1 to 20.")
+				dialog.InfoDialog(
+					"Value Error", "Please enter a number from 1 to 20.",
+					remove_after = 4, default_css = False
+				)
 				return
 			data["experience"]["level"]["character"] = newCharacterLevel
 			data["experience"]["total"] = levelsAndEXPRequired[
@@ -479,7 +507,10 @@ def setLevel(event):
 			levelSetDialog.close()
 			reloadValues()
 		except ValueError:
-			dialog.InfoDialog("Value Error", "Please enter an integer number.")
+			dialog.InfoDialog(
+				"Value Error", "Please enter an integer number.",
+				remove_after = 4, default_css = False
+			)
 	
 	levelSetDialog.ok_button.bind("click", okHandler)
 
@@ -495,7 +526,10 @@ def adjustExperience(event):
 		try:
 			newXP = int(addExperienceDialog.select("#xpAmount")[0].value)
 			if newXP < 0:
-				dialog.InfoDialog("Value Error", "Experience must be non-negative!")
+				dialog.InfoDialog(
+					"Value Error", "Experience must be non-negative!",
+					remove_after = 4, default_css = False
+				)
 				return
 			if method == "Add":
 				data["experience"]["total"] += newXP
@@ -511,7 +545,10 @@ def adjustExperience(event):
 			addExperienceDialog.close()
 			reloadValues()
 		except ValueError:
-			dialog.InfoDialog("Value Error", "Please enter an integer.")
+			dialog.InfoDialog(
+				"Value Error", "Please enter an integer.",
+				remove_after = 4, default_css = False
+			)
 
 	addExperienceDialog.ok_button.bind("click", okHandler)
 
@@ -582,7 +619,8 @@ def updateArmor(event):
 		except ValueError:
 			dialog.InfoDialog(
 				"Armor Class Error",
-				"Please only enter integers in the AC field."
+				"Please only enter integers in the AC field.",
+				remove_after = 4, default_css = False
 			)
 
 	refreshArmorDisplay()
@@ -613,7 +651,8 @@ def exchangeCoins(event):
 		amount = int(event.target.value)
 	except ValueError:
 		dialog.InfoDialog(
-			"Currency Error", "Please only enter integers in the currency fields."
+			"Currency Error", "Please only enter integers in the currency fields.",
+			remove_after = 4, default_css = False
 		)
 		event.target.value = data["currency"][event.target.id]
 		return
@@ -687,7 +726,8 @@ def adjustSkill(event):
 			if newSkillAbility == '':
 				dialog.InfoDialog(
 					"Radio Button Error",
-					"Couldn't detect an ability, this shoulnd't be happening!"
+					"Couldn't detect an ability, this shoulnd't be happening!",
+					remove_after = 4, default_css = False
 				)
 				return
 
@@ -695,7 +735,8 @@ def adjustSkill(event):
 				and newSkillName in data["proficiency"]["skills"].keys():
 				dialog.InfoDialog(
 					"Name Error",
-					"A skill already exists with that name, please enter another one."
+					"A skill already exists with that name, please enter another one.",
+					remove_after = 4, default_css = False
 				)
 				return
 
@@ -781,7 +822,8 @@ def adjustFeature(event):
 		except ValueError:
 			dialog.InfoDialog(
 				"Feature Value Error",
-				"Please only enter integers in the feature value fields."
+				"Please only enter integers in the feature value fields.",
+				remove_after = 4, default_css = False
 			)
 			document[feature + "`Feature`Value"].value = data["features"][feature]["value"]
 
@@ -816,7 +858,8 @@ def adjustFeature(event):
 				and newFeatureName in data["features"].keys():
 				dialog.InfoDialog(
 					"Name Error",
-					"A feature already exists with that name, please choose another one."
+					"A feature already exists with that name, please choose another one.",
+					remove_after = 4, default_css = False
 				)
 				return
 			#print("Everything checks out.")
@@ -832,7 +875,8 @@ def adjustFeature(event):
 				except ValueError:
 					dialog.InfoDialog(
 						"Value Error",
-						"The feature's value must be an integer number. Please correct it."
+						"The feature's value must be an integer number. Please correct it.",
+						remove_after = 4, default_css = False
 					)
 					return
 
@@ -938,7 +982,8 @@ def adjustItem(event):
 				"Item " + method + " Error",
 				"Please only enter " \
 					+ ("integers " if method == "Count" else "floats ") \
-					+ "in the " + method.lower() + " field."
+					+ "in the " + method.lower() + " field.",
+				remove_after = 4, default_css = False
 			)
 
 	elif method == "Delete":
@@ -1018,7 +1063,8 @@ def adjustItem(event):
 			if newItemName != item and newItemName in data["inventory"].keys():
 				dialog.InfoDialog(
 					"Name Error",
-					"An item already exists with that name. Please choose another one."
+					"An item already exists with that name. Please choose another one.",
+					remove_after = 4, default_css = False
 				)
 				return
 			
@@ -1028,20 +1074,23 @@ def adjustItem(event):
 						float(editItemDialog.select('#' + i)[0].value) < 0.0:
 						dialog.InfoDialog(
 							"Weight Error",
-							"Weight must be non-negative!"
+							"Weight must be non-negative!",
+							remove_after = 4, default_css = False
 						)
 						return
 					elif i != "weight" and \
 						int(editItemDialog.select('#' + i)[0].value) < 0:
 						dialog.InfoDialog(
 							i.capitalize() + " Error",
-							i.capitalize() + " must be non-negative!"
+							i.capitalize() + " must be non-negative!",
+							remove_after = 4, default_css = False
 						)
 						return
 				except ValueError:
 					dialog.InfoDialog(
 						i.capitalize() + " Error",
-						i.capitalize() + " must be a number!"
+						i.capitalize() + " must be a number!",
+						remove_after = 4, default_css = False
 					)
 					return
 
@@ -1051,13 +1100,15 @@ def adjustItem(event):
 						if int(editItemDialog.select('#dmg' + i)[0].value) < 0:
 							dialog.InfoDialog(
 								"Damage " + i.capitalize() + " Error",
-								"Damage " + i.capitalize() + " must be non-negative!"
+								"Damage " + i.capitalize() + " must be non-negative!",
+								remove_after = 4, default_css = False
 							)
 							return
 					except ValueError:
 						dialog.InfoDialog(
 							"Damage " + i.capitalize() + " Error",
-							"Damage " + i.capitalize() + " must be an integer!"
+							"Damage " + i.capitalize() + " must be an integer!",
+							remove_after = 4, default_css = False
 						)
 						return
 
