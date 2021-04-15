@@ -176,6 +176,42 @@ def adjustClass(event):
 
 document["classEdit"].bind("click", adjustClass)
 
+def adjustWHeight(event):
+	editWHeightDialog = wheightEdit(
+		data["biography"]["height"], data["biography"]["weight"]
+	)
+
+	editWHeightDialog.select("#editHeight")[0].checked = True
+	editWHeightDialog.select("#editHeight")[0].dispatchEvent(
+		window.Event.new("change")
+	)
+
+	def okHandler(event):
+		for r in editWHeightDialog.select("input[name=\"measure\"]"):
+			if r.checked:
+				field = r.value
+				break
+
+		try:
+			newMeasure = float(
+				editWHeightDialog.select("#measure")[0].value
+			)
+			if newMeasure < 0.0:
+				return
+
+			data["biography"][field]["measure"] = newMeasure
+			data["biography"][field]["unit"] = \
+				editWHeightDialog.select("#unit")[0].value
+		except ValueError:
+			return
+
+		editWHeightDialog.close()
+		reloadValues()
+	
+	editWHeightDialog.ok_button.bind("click", okHandler)
+
+document["wheightEdit"].bind("click", adjustWHeight)
+
 # ABILITY SCORE FUNCTIONS
 def calculateAbilityBonus(score : int) -> int:
 	return (score - 10) // 2
@@ -689,7 +725,7 @@ def updateSkillsTable():
 
 		row <= html.TD(html.B(ability.upper()))
 
-		skillData = html.TD()
+		skillData = html.TD(Class = "tdWithInput")
 		skillValue = html.INPUT(
 			id = inputID + "`Value",
 			value = data["abilities"][abilityTranslator[ability]]["bonus"] \
@@ -699,7 +735,7 @@ def updateSkillsTable():
 		skillData <= skillValue
 		row <= skillData
 
-		skillSettings = html.TD()
+		skillSettings = html.TD(Class = "tdWithInput")
 
 		skillEditButton = html.INPUT(
 			id = inputID + "`Edit", Class = "skillButton",
@@ -831,7 +867,7 @@ def updateFeaturesTable():
 		row <= html.TD(html.H3(k), Class = "featureName")
 		row <= html.TD(data["features"][k]["description"], Class = "featureDesc")
 
-		numericCell = html.TD()
+		numericCell = html.TD(Class = "tdWithInput")
 		if data["features"][k]["type"] == "numeric":
 		#	decrementButton = html.INPUT(
 		#		id = inputID + "`Decrement", Class = "featureButton",
@@ -856,7 +892,7 @@ def updateFeaturesTable():
 
 		row <= numericCell
 
-		featSettings = html.TD()
+		featSettings = html.TD(Class = "tdWithInput")
 
 		featEditButton = html.INPUT(
 			id = inputID + "`Edit", Class = "featureButton",
@@ -1074,14 +1110,16 @@ def makeDamageString(damageDict : dict) -> str:
 	abilityKey = abilityTranslator[
 		damageDict["ability"]
 	]
-	bonus = data["abilities"][abilityKey]["bonus"] \
-		+ (data["proficiency"]["bonus"] if damageDict["proficient"] else 0) \
-		+ damageDict["bonus"]
+	bonus = data["abilities"][abilityKey]["bonus"] + damageDict["bonus"]
+
+	toHit = bonus - damageDict["bonus"] + \
+		+ (data["proficiency"]["bonus"] if damageDict["proficient"] else 0) 
 	
 	return str(damageDict["count"]) + 'd' + str(damageDict["die"]) \
-		+ " + " + str(bonus) + ' ' + damageDict["type"] \
+		+ "+" + str(bonus) + ' ' + damageDict["type"] \
 		+ " (" + str(damageDict["count"] + bonus) + '-' \
-		+ str(damageDict["count"] * damageDict["die"] + bonus) + ')'
+		+ str(damageDict["count"] * damageDict["die"] + bonus) + "), +" \
+		+ str(toHit) + " to hit"
 
 def calculateTotalWeight() -> float:
 	return round(
@@ -1110,7 +1148,7 @@ def updateItemsTable():
 		row <= html.TD(html.H3(k), Class = "itemName")
 		row <= html.TD(data["inventory"][k]["description"], Class = "itemDesc")
 
-		itemCountCell = html.TD()
+		itemCountCell = html.TD(Class = "tdWithInput")
 		itemCountCell <= html.INPUT(
 			id = inputID + "`Count", Class = "itemNumericCell",
 			value = data["inventory"][k]["count"],
@@ -1119,7 +1157,7 @@ def updateItemsTable():
 		itemCountCell.bind("input", adjustItem)
 		row <= itemCountCell
 
-		itemWeightCell = html.TD()
+		itemWeightCell = html.TD(Class = "tdWithInput")
 		itemWeightCell <= html.INPUT(
 			id = inputID + "`Weight", Class = "itemNumericCell",
 			value = data["inventory"][k]["weight"],
@@ -1128,9 +1166,9 @@ def updateItemsTable():
 		itemWeightCell.bind("input", adjustItem)
 		row <= itemWeightCell
 
-		itemValueCell = html.TD()
+		itemValueCell = html.TD(Class = "tdWithInput")
 		itemValueCell <= html.INPUT(
-			id = inputID + "`Value", readonly = '',
+			id = inputID + "`Value", Class = "itemCurrencyCell", readonly = '',
 			value = makeCoinString(data["inventory"][k]["value"]),
 		)
 		row <= itemValueCell
@@ -1147,7 +1185,7 @@ def updateItemsTable():
 		else:
 			row <= html.TD(colspan = 2)
 
-		itemSettingsCell = html.TD()
+		itemSettingsCell = html.TD(Class = "tdWithInput")
 
 		itemEditButton = html.INPUT(
 			id = inputID + "`Edit", Class = "itemButton",

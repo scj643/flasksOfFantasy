@@ -2,7 +2,7 @@ from browser import document, html
 import browser.widgets.dialog as dialog
 
 def classEdit() -> dialog.Dialog:
-	d = dialog.Dialog("Class(es)", ok_cancel = True)
+	d = dialog.Dialog("Class(es)", ok_cancel = True, default_css = False)
 	def toggleLevels(event):
 		if event.target.checked:
 			del d.select("#levelList")[0].attrs["readonly"]
@@ -31,8 +31,48 @@ def classEdit() -> dialog.Dialog:
 
 	return d
 
+def wheightEdit(heightData, weightData) -> dialog.Dialog:
+	d = dialog.Dialog("Edit Weight/Height", ok_cancel = True, default_css = False)
+
+	def setMeasure(event):
+		for r in d.select("input[name=\"measure\"]"):
+			if r.checked:
+				measure = r.value
+				break
+
+		if measure == "height":
+			dataDict = heightData
+		else:
+			dataDict = weightData
+			
+		d.select("#measure")[0].value = dataDict["measure"]
+		d.select("#unit")[0].value = dataDict["unit"]
+
+	heightRadio = html.INPUT(
+		id = "editHeight", type = "radio", name = "measure", value = "height"
+	)
+	heightRadio.bind("change", setMeasure)
+	d.panel <= heightRadio
+	d.panel <= html.LABEL("Height", For = "editHeight")
+
+	weightRadio = html.INPUT(
+		id = "editWeight", type = "radio", name = "measure", value = "weight"
+	)
+	weightRadio.bind("change", setMeasure)
+	d.panel <= weightRadio
+	d.panel <= html.LABEL("Weight", For = "editWeight")
+	d.panel <= html.BR()
+
+	d.panel <= html.LABEL("Measure:", For = "measure")
+	d.panel <= html.INPUT(id = "measure", type = "number", min = 0, step = 0.01)
+	d.panel <= html.BR()
+	d.panel <= html.LABEL("Unit:", For = "unit")
+	d.panel <= html.INPUT(id = "unit")
+
+	return d;
+	
 def levelSet() -> dialog.Dialog:
-	d = dialog.Dialog("Set Character Level", ok_cancel = True)
+	d = dialog.Dialog("Set Character Level", ok_cancel = True, default_css = False)
 
 	d.panel <= html.LABEL("Enter your new Character Level (1 -> 20):", For = "newCharLevel")
 	d.panel <= html.INPUT(id = "newCharLevel", type = "number", min = 1, max = 20)
@@ -52,7 +92,7 @@ def experienceAdjust(method) -> dialog.Dialog:
 		titleString = "Add Experience"
 		labelString = "Amount of Experience to add:"
 	
-	d = dialog.Dialog(titleString, ok_cancel = True)
+	d = dialog.Dialog(titleString, ok_cancel = True, default_css = False)
 
 	d.panel <= html.LABEL(labelString, For = "xpAmount")
 	d.panel <= html.INPUT(id = "xpAmount", type = "number", min = 0)
@@ -66,14 +106,14 @@ def experienceAdjust(method) -> dialog.Dialog:
 	return d
 
 def skillEdit(skill : str) -> dialog.Dialog:
-	d = dialog.Dialog(skill, ok_cancel = True)
+	d = dialog.Dialog(skill, ok_cancel = True, default_css = False)
 	abilities = (
 		"strength", "dexterity", "constitution",
 		"intelligence", "wisdom", "charisma"
 	)
 
 	d.panel <= html.LABEL("Skill Name:", For = "name")
-	d.panel <= html.INPUT(id = "name")
+	d.panel <= html.INPUT(id = "name", Class = "dialogName")
 	d.panel <= html.BR()
 
 	for a in abilities:
@@ -87,7 +127,7 @@ def skillEdit(skill : str) -> dialog.Dialog:
 	return d
 
 def featureEdit(feature : str) -> dialog.Dialog:
-	d = dialog.Dialog(feature, ok_cancel = True)
+	d = dialog.Dialog(feature, ok_cancel = True, default_css = False)
 	def toggleNumeric(event):
 		if event.target.checked:
 			del d.select("#value")[0].attrs["readonly"]
@@ -95,7 +135,7 @@ def featureEdit(feature : str) -> dialog.Dialog:
 			d.select("#value")[0].attrs["readonly"] = ''
 	
 	d.panel <= html.LABEL("Feature Name:", For = "name")
-	d.panel <= html.INPUT(id = "name")
+	d.panel <= html.INPUT(id = "name", Class = "dialogName")
 	d.panel <= html.BR()
 	d.panel <= html.LABEL("Feature Description:", For = "desc")
 	d.panel <= html.INPUT(id = "description")
@@ -111,7 +151,7 @@ def featureEdit(feature : str) -> dialog.Dialog:
 	return d
 
 def itemEdit(item : str) -> dialog.Dialog:
-	d = dialog.Dialog(item, ok_cancel = True)
+	d = dialog.Dialog(item, ok_cancel = True, default_css = False)
 	def toggleWeapon(event):
 		for i in d.select(".weapon"):
 			if i.type == "radio" or i.type == "checkbox":
@@ -126,7 +166,8 @@ def itemEdit(item : str) -> dialog.Dialog:
 					i.attrs["readonly"] = ''
 
 	d.panel <= html.LABEL("Item Name:", For = "name")
-	d.panel <= html.INPUT(id = "name")
+	d.panel <= html.INPUT(id = "name", Class = "dialogName")
+	d.panel <= html.BR()
 	d.panel <= html.LABEL("Item Description:", For = "desc")
 	d.panel <= html.INPUT(id = "description")
 	d.panel <= html.BR()
@@ -191,6 +232,7 @@ def itemEdit(item : str) -> dialog.Dialog:
 		name = "type", value = "slashing", disabled = ''
 	)
 	d.panel <= html.LABEL("Slashing", For = "damageTypeS")
+	d.panel <= html.BR()
 	d.panel <= html.INPUT(
 		id = "isProficient", Class = "weapon",
 		type = "checkbox", disabled = ''
@@ -231,7 +273,7 @@ def itemEdit(item : str) -> dialog.Dialog:
 	return d
 	
 def listEntryDelete(item : str, itemType : str) -> dialog.Dialog:
-	d = dialog.Dialog("Confirm Deletion", ok_cancel = ("Yes", "No"))
+	d = dialog.Dialog("Confirm Deletion", ok_cancel = ("Yes", "No"), default_css = False)
 
 	d.panel <= html.B(
 		"Are you sure you want to delete the \"" + item + "\" " + itemType + "?"
