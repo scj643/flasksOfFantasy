@@ -228,6 +228,35 @@ def adjustWHeight(event):
 document["wheightEdit"].bind("click", adjustWHeight)
 
 # ABILITY SCORE FUNCTIONS
+def refreshAbilityScores():
+	modifications = {
+		a: 0
+		for a in data["abilities"].keys()
+	}
+
+	for f in data["features"].keys():
+		if data["features"][f]["type"] == "numeric" \
+			and data["features"][f]["abilityMod"] \
+			and data["features"][f]["isAbilityModActive"]:
+			modifications[
+				abilityTranslator[data["features"][f]["ability"]]
+			] += data["features"][f]["value"]
+
+	if False in [m == 0 for m in modifications.values()]:
+		for k in data["abilities"].keys():
+			score = data["abilities"][k]["score"] + modifications[k]
+			document[k].value = score
+			document[k + "Bonus"].value = calculateAbilityBonus(score)
+
+	else:
+		for k in data["abilities"].keys():
+			document[k].value = data["abilities"][k]["score"]
+			document[k + "Bonus"].value = data["abilities"][k]["bonus"]
+	
+	refreshArmorDisplay()
+	updateSkillsTable()
+	updateItemsTable()
+
 def calculateAbilityBonus(score : int) -> int:
 	return (score - 10) // 2
 
@@ -235,12 +264,9 @@ def syncAbilityScore(ability : str, newValue : int):
 	newBonus = calculateAbilityBonus(newValue)
 
 	data["abilities"][ability]["score"] = newValue
-	document[ability].value = newValue
-
 	data["abilities"][ability]["bonus"] = newBonus
-	document[ability + "Bonus"].value = newBonus
 
-	refreshArmorDisplay()
+	refreshAbilityScores()
 	updateItemsTable()
 
 def adjustAbilityScore(event):
@@ -573,13 +599,13 @@ def updateClassLevelDivs():
 def refreshArmorDisplay():
 	if data["armorType"] == "light" or data["armorType"] == "unarmored":
 		document["armorClass`Value"].value = data["armorClass"] + ( \
-			data["abilities"]["dexterity"]["bonus"] \
+			int(document["dexterityBonus"].value) \
 			if not document["armorClass`ShowBase"].checked \
 			else 0
 		)
 	elif data["armorType"] == "medium":
 		document["armorClass`Value"].value = data["armorClass"] + ( \
-			min(data["abilities"]["dexterity"]["bonus"], 2) \
+			min(int(document["dexterityBonus"].value), 2) \
 			if not document["armorClass`ShowBase"].checked \
 			else 0
 		)
@@ -587,21 +613,21 @@ def refreshArmorDisplay():
 		document["armorClass`Value"].value = data["armorClass"]
 	elif data["armorType"] == "unarmoredB":
 		document["armorClass`Value"].value = data["armorClass"] + ( \
-			data["abilities"]["dexterity"]["bonus"] \
-			+ data["abilities"]["constitution"]["bonus"] \
+			int(document["dexterityBonus"].value) \
+			+ int(document["constitutionBonus"].value) \
 			if not document["armorClass`ShowBase"].checked \
 			else 0
 		)
 	elif data["armorType"] == "unarmoredM":
 		document["armorClass`Value"].value = data["armorClass"] + ( \
-			data["abilities"]["dexterity"]["bonus"] \
-			+ data["abilities"]["wisdom"]["bonus"] \
+			int(document["dexterityBonus"].value) \
+			+ int(document["wisdomBonus"].value) \
 			if not document["armorClass`ShowBase"].checked \
 			else 0
 		)
 	#elif data["armorType"] == "mage":
 	#	document["armorClass`Value"].value = (
-	#		13 + data["abilities"]["dexterity"]["bonus"] \
+	#		13 + int(document["dexterityBonus"].value) \
 	#		if not document["armorClass`ShowBase"].checked \
 	#		else data["armorClass"]
 	#	)
@@ -769,7 +795,7 @@ def updateSkillsTable():
 		skillData = html.TD(Class = "tdWithInput")
 		skillValue = html.INPUT(
 			id = inputID + "`Value",
-			value = data["abilities"][abilityTranslator[ability]]["bonus"] \
+			value = int(document[abilityTranslator[ability] + "Bonus"].value) \
 				+ proficiencyBonus,
 			Type = "number", readonly = ''
 		)
@@ -827,6 +853,10 @@ def adjustFeature(event):
 			)
 			document[feature + "`Feature`Value"].value = data["features"][feature]["value"]
 
+	elif method == "AMActive":
+		data["features"][feature]["isAbilityModActive"] = \
+			event.target.checked
+
 	elif method == "Delete":
 		deleteFeatDialog = listEntryDelete(feature, "feature")
 
@@ -834,6 +864,7 @@ def adjustFeature(event):
 			del data["features"][feature]
 			deleteFeatDialog.close()
 			updateFeaturesTable()
+			refreshAbilityScores()
 
 		deleteFeatDialog.ok_button.bind("click", deleteHandler)
 		
@@ -847,10 +878,26 @@ def adjustFeature(event):
 
 			if data["features"][feature]["type"] == "numeric":
 				editFeatDialog.select("#numericCheck")[0].checked = True
+
+				editFeatDialog.select("#abilityModCheck")[0].checked = \
+					data["features"][feature]["abilityMod"]
+				del editFeatDialog.select("#abilityModCheck")[0].attrs["disabled"]
+				if data["features"][feature]["abilityMod"]:
+					editFeatDialog.select(
+						'#' + abilityTranslator[
+							data["features"][feature]["ability"]
+						] + "RB"
+					)[0].checked = True
+					editFeatDialog.select("#abilityModCheck")[0].dispatchEvent(
+						window.Event.new("change")
+					)
+
 				del editFeatDialog.select("#value")[0].attrs["readonly"]
 				editFeatDialog.select(
 					"#value"
 				)[0].value = data["features"][feature]["value"]
+		else:
+			editFeatDialog.select("#strengthRB")[0].checked = True
 
 		def okHandler(event):
 			newFeatureName = editFeatDialog.select("#name")[0].value
@@ -883,8 +930,16 @@ def adjustFeature(event):
 				newFeature = {
 					"description": newFeatureDescription,
 					"type": "numeric",
-					"value": newFeatureValue
+					"value": newFeatureValue,
+					"abilityMod": False
 				}
+				if editFeatDialog.select("#abilityModCheck")[0].checked:
+					newFeature["abilityMod"] = True
+					newFeature["isAbilityModActive"] = False
+					for r in editFeatDialog.select("input[name=\"ability\"]"):
+						if r.checked:
+							newFeature["ability"] = r.value
+							break
 			else:
 				newFeature = {
 					"description": newFeatureDescription,
@@ -896,8 +951,10 @@ def adjustFeature(event):
 				del data["features"][feature]
 			editFeatDialog.close()
 			updateFeaturesTable()
+			refreshAbilityScores()
 
 		editFeatDialog.ok_button.bind("click", okHandler)
+	refreshAbilityScores()
 
 document["Create Feature``New"].bind("click", adjustFeature)
 document["featuresEdit"].bind("change", lambda e : toggleEditing(e, "featureValue"))
@@ -908,7 +965,25 @@ def updateFeaturesTable():
 	for k in sorted(data["features"].keys()):
 		inputID = k + "`Feature"
 		row = html.TR(id = inputID + "`Row", Class = "featureRow")
-		row <= html.TD(html.H3(k), Class = "featureName")
+
+		featName = html.TD(html.H3(k), Class = "featureName")
+		if data["features"][k]["type"] == "numeric" \
+			and data["features"][k]["abilityMod"]:
+			featName = html.TD(
+				html.H3('[' + data["features"][k]["ability"].upper() + "] " + k),
+				Class = "featureName"
+			)
+			abModCheckbox = html.INPUT(
+				id = inputID + "`AMActive", type = "checkbox"
+			)
+			abModCheckbox.bind("change", adjustFeature)
+			featName <= abModCheckbox
+			featName <= html.LABEL("Is Feature Active?", For = inputID + "`AMActive")
+
+			if data["features"][k]["isAbilityModActive"]:
+				abModCheckbox.checked = True
+		row <= featName
+
 		row <= html.TD(data["features"][k]["description"], Class = "featureDesc")
 
 		numericCell = html.TD(Class = "tdWithInput")
@@ -920,12 +995,13 @@ def updateFeaturesTable():
 		#	decrementButton.bind("click", adjustFeature)
 		#	numericCell <= decrementButton
 
-			numericCell <= html.INPUT(
+			numericValue = html.INPUT(
 				id = inputID + "`Value", Class = "featureValue",
 				value = data["features"][k]["value"],
 				type = "number", readonly = ''
 			)
-			numericCell.bind("input", adjustFeature)
+			numericValue.bind("input", adjustFeature)
+			numericCell <= numericValue
 
 		#	incrementButton = html.INPUT(
 		#		id = inputID + "`Increment", Class = "featureButton",
@@ -1161,7 +1237,7 @@ def makeDamageString(damageDict : dict) -> str:
 	abilityKey = abilityTranslator[
 		damageDict["ability"]
 	]
-	bonus = data["abilities"][abilityKey]["bonus"] + damageDict["bonus"]
+	bonus = int(document[abilityKey + "Bonus"].value) + damageDict["bonus"]
 
 	toHit = bonus - damageDict["bonus"] + \
 		+ (data["proficiency"]["bonus"] if damageDict["proficient"] else 0) 
@@ -1272,11 +1348,8 @@ def reloadValues():
 				+ ' ' + data["biography"][k]["unit"]
 			#print("(height/weight)")
 
+	refreshAbilityScores()
 	#print(data["hit"]["deathSaves"])
-
-	for k in data["abilities"].keys():
-		document[k].value = data["abilities"][k]["score"]
-		document[k + "Bonus"].value = data["abilities"][k]["bonus"]
 
 	document["currentHit`Value"].value = data["hit"]["current"]
 	document["maxHit"].value = data["hit"]["max"]
@@ -1348,7 +1421,8 @@ def saveSheet(event):
 			r, {
 				"noErrorTitle": "Sheet Saved",
 				"noErrorBody": "Your sheet was saved successfully.",
-				"errorTitle": "E R R O R"
+				"errorTitle": "E R R O R",
+				"defaultCSS": False
 			},
 			()
 		)

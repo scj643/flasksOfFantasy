@@ -88,7 +88,8 @@ defaultSheet = {
 		"featB": {
 			"type": "numeric",
 			"description": '',
-			"value": 0
+			"value": 0,
+			"abilityMod": False
 		}
 	},
 	"inventory": {

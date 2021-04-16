@@ -29,7 +29,12 @@ def sheetReplyGeneric(response, dialogStrings, replyKeys):
 				dialogStrings["noErrorTitle"],
 				dialogStrings["noErrorBody"].format([
 					reply[key] for key in replyKeys
-				])
+				]),
+				default_css = (
+					dialogStrings["defaultCSS"] \
+						if "defaultCSS" in dialogStrings.keys()
+						else True
+				)
 			)
 		else:
 			dialog.InfoDialog(dialogStrings["errorTitle"], reply["error"])

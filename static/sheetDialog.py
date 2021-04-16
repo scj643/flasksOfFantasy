@@ -1,4 +1,4 @@
-from browser import document, html
+from browser import document, window, html
 import browser.widgets.dialog as dialog
 
 def classEdit() -> dialog.Dialog:
@@ -105,12 +105,13 @@ def experienceAdjust(method) -> dialog.Dialog:
 
 	return d
 
+abilities = (
+	"strength", "dexterity", "constitution",
+	"intelligence", "wisdom", "charisma"
+)
+
 def skillEdit(skill : str) -> dialog.Dialog:
 	d = dialog.Dialog(skill, ok_cancel = True, default_css = False)
-	abilities = (
-		"strength", "dexterity", "constitution",
-		"intelligence", "wisdom", "charisma"
-	)
 
 	d.panel <= html.LABEL("Skill Name:", For = "name")
 	d.panel <= html.INPUT(id = "name", Class = "dialogName")
@@ -131,8 +132,22 @@ def featureEdit(feature : str) -> dialog.Dialog:
 	def toggleNumeric(event):
 		if event.target.checked:
 			del d.select("#value")[0].attrs["readonly"]
+			del d.select("#abilityModCheck")[0].attrs["disabled"]
 		else:
 			d.select("#value")[0].attrs["readonly"] = ''
+			d.select("#abilityModCheck")[0].attrs["disabled"] = ''
+			d.select("#abilityModCheck")[0].checked = False
+			d.select("#abilityModCheck")[0].dispatchEvent(window.Event.new("change"))
+
+	def toggleAbility(event):
+		for a in abilities:
+			if event.target.checked:
+				del d.select('#' + a + "RB")[0].attrs["disabled"]
+			else:
+				d.select('#' + a + "RB")[0].attrs["disabled"] = ''
+		
+		if True not in [r.checked for r in d.select("input[name=\"ability\"]")]:
+			d.select("#strengthRB")[0].checked = True
 	
 	d.panel <= html.LABEL("Feature Name:", For = "name")
 	d.panel <= html.INPUT(id = "name", Class = "dialogName")
@@ -140,13 +155,28 @@ def featureEdit(feature : str) -> dialog.Dialog:
 	d.panel <= html.LABEL("Feature Description:", For = "desc")
 	d.panel <= html.INPUT(id = "description")
 	d.panel <= html.BR()
+
 	d.panel <= html.LABEL("Is Numeric?", For = "numericCheck")
 	numericCheck = html.INPUT(id = "numericCheck", type = "checkbox")
 	numericCheck.bind("change", toggleNumeric)
 	d.panel <= numericCheck
+	d.panel <= html.LABEL("Modifies Ability Score?", For = "abilityModCheck")
+	abilityModCheck  = html.INPUT(id = "abilityModCheck", type = "checkbox", disabled = '')
+	abilityModCheck.bind("change", toggleAbility)
+	d.panel <= abilityModCheck
 	d.panel <= html.BR()
+
 	d.panel <= html.LABEL("Feature Value:", For = "value")
 	d.panel <= html.INPUT(id = "value", Type = "number", readonly = '')
+	d.panel <= html.BR()
+
+	for a in abilities:
+		d.panel <= html.INPUT(
+			id = a + "RB", name = "ability",
+			value = a[:3], type = "radio", disabled = ''
+		)
+		d.panel <= html.LABEL(a.capitalize(), For = a + "RB")
+		d.panel <= html.BR()
 
 	return d
 

@@ -113,6 +113,10 @@ input:not([type]), input[type = "number"] {
 	padding: 8px 0px 4px 0px;
 }
 
+.tdWithInput>input:not([class]) {
+	width: 60px;
+}
+
 input[type = "button"], .brython-dialog-button {
 	border: 4px outset sandybrown;
 	border-radius: 2px;
@@ -216,52 +220,10 @@ input#description, #name.bio, #race.bio {
 	grid-column-start: 2;
 }
 
-#biography {
-	grid-row-start: 2;
-	grid-column: 1 / span 4;
-}
-
-.cosmetic {
-	display: inline-block;
-	width: 100px;
-	text-align: right;
-}
-/*
-#biographyCosmetic {
-	display: grid;
-}
-
-#gender, #size {
-	grid-column-start: 2;
-}
-
-#eyeColor, #height {
-	grid-column-start: 4;
-}
-
-#hairColor, #weight {
-	grid-column-start: 6;
-}
-
-#wheightEdit {
-	grid-column-start: 7;
-}
-*/
-#abilities {
-	grid-row-start: 3;
-	grid-column: 1 / span 2;
-}
-
 .abilityDiv {
 	text-align: center;
 	margin: 4px auto 4px auto;
 	width: 66%;
-}
-
-#statistics {
-	grid-row: 3 / span 2;
-	grid-column: 3 / span 2;
-	display: grid;
 }
 
 #hit {
@@ -297,22 +259,110 @@ input#description, #name.bio, #race.bio {
 	grid-column-start: 2;
 }
 
-#skillsDiv {
-	grid-row: 4 / span 2;
-	grid-column: 1  / span 2;
+/*
+#biographyCosmetic {
+	display: grid;
 }
 
-#featuresDiv {
-	grid-row: 5 / span 3;
-	grid-column: 3 / span 2;
+#gender, #size {
+	grid-column-start: 2;
 }
 
-#itemsDiv {
-	grid-row-start: 8;
-	grid-column: 1 / span 4;
+#eyeColor, #height {
+	grid-column-start: 4;
 }
 
-#spellsDiv {
-	grid-row-start: 9;
-	grid-column: 1 / span 4;
+#hairColor, #weight {
+	grid-column-start: 6;
+}
+
+#wheightEdit {
+	grid-column-start: 7;
+}
+*/
+
+@media only screen and (min-width: 1440px) {
+	#biography {
+		grid-row-start: 2;
+		grid-column: 1 / span 4;
+	}
+
+	.cosmetic {
+		display: inline-block;
+		width: 100px;
+		text-align: right;
+	}
+
+	#abilities {
+		grid-row-start: 3;
+		grid-column: 1 / span 2;
+	}
+
+	#statistics {
+		grid-row: 3 / span 2;
+		grid-column: 3 / span 2;
+		display: grid;
+	}
+
+	#skillsDiv {
+		grid-row: 4 / span 2;
+		grid-column: 1  / span 2;
+	}
+
+	#featuresDiv {
+		grid-row: 5 / span 3;
+		grid-column: 3 / span 2;
+	}
+
+	#itemsDiv {
+		grid-row-start: 8;
+		grid-column: 1 / span 4;
+	}
+
+	#spellsDiv {
+		grid-row-start: 9;
+		grid-column: 1 / span 4;
+	}
+}
+
+@media only screen and (max-width: 1439px) {
+	#biography {
+		grid-row-start: 2;
+		grid-column: 1 / span 4;
+	}
+
+	#biographyKey>label, #biographyCosmetic>label, #currency>label {
+		display: block;
+	}
+
+	#abilities {
+		grid-row-start: 3;
+		grid-column: 1 / span 4;
+	}
+
+	#statistics {
+		grid-row-start: 4;;
+		grid-column: 1 / span 4;
+		display: grid;
+	}
+
+	#skillsDiv {
+		grid-row-start 5;
+		grid-column: 1  / span 4;
+	}
+
+	#featuresDiv {
+		grid-row-start: 6;
+		grid-column: 1 / span 4;
+	}
+
+	#itemsDiv {
+		grid-row-start: 7;
+		grid-column: 1 / span 4;
+	}
+
+	#spellsDiv {
+		grid-row-start: 8;
+		grid-column: 1 / span 4;
+	}
 }
