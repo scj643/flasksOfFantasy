@@ -1053,6 +1053,7 @@ def adjustItem(event):
 				)
 
 			document["totalWeight"].value = calculateTotalWeight()
+			document["totalWorth"].value = calculateTotalWorth()
 		except ValueError:
 			dialog.InfoDialog(
 				"Item " + method + " Error",
@@ -1258,6 +1259,22 @@ def calculateTotalWeight() -> float:
 		2
 	)
 
+def calculateTotalWorth() -> str:
+	return goldPieceSign + format(
+		round(
+			sum(
+				data["inventory"][i]["count"] * (
+					data["inventory"][i]["value"]["gold"] \
+						+ (0.1 * data["inventory"][i]["value"]["silver"]) \
+						+ (0.01 * data["inventory"][i]["value"]["copper"])
+				)
+				for i in data["inventory"].keys()
+			),
+			2
+		),
+		".2f"
+	)
+
 def updateItemsTable():
 	def makeWeaponKindString(kind : str) -> str:
 		if kind[0] == 's':
@@ -1266,6 +1283,7 @@ def updateItemsTable():
 			return kind[:7].capitalize() + ' ' + kind[7:]
 	
 	document["totalWeight"].value = calculateTotalWeight()
+	document["totalWorth"].value = calculateTotalWorth()
 
 	for row in document.select("tr.itemRow"):
 		del document[row.id]

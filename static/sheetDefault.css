@@ -97,6 +97,11 @@ input[type = "button"], input[type = "checkbox"], input[type = "radio"], .brytho
 	width: auto;
 }
 
+#totalWorth {
+	width: 160px;
+	text-align: right;
+}
+
 input[type = "button"], input:not([type]), input[type = "number"], .brython-dialog-button {
 	background-color: peachpuff;
 	border: 2px inset sandybrown;
