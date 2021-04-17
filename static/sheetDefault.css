@@ -7,14 +7,28 @@
 	src: url(/static/FantasqueSansMono-Regular.woff);
 	font-family: fantasque;
 }
+/* Change these color properties to set your own palette for the page;
+Either use keyworded colors (see https://www.w3schools.com/cssref/css_colors.asp)
+Or use a notation (such as RGB, hex, or HSL) */
+:root {
+	--colorBackground: oldlace; /*Main Page Background*/
+	--colorDivBorder: tan; /*<div> Border*/
+	--colorDialogBorder: goldenrod; /*Dialog Box Border*/
+	--colorDialogShadow: sienna; /*Dialog Box Shadow*/
+	--colorInputBorder: sandybrown; /*Input Field Border*/
+	--colorInputBGActive: peachpuff; /*Input Field Active Background*/
+	--colorButtonShadow: saddlebrown; /*Button Lower Shadow*/
+	--colorTableHeadBorder: tan; /*Table Header Row Border*/
+	--colorTableDataBorder: tan; /*Table Data Row Border*/
+}
 
 body {
-	background-color: linen;
+	background-color: var(--colorBackground);
 	font-family: fantasque;
 }
 
 div {
-	border: 4px outset tan;
+	border: 4px outset var(--colorDivBorder);
 	border-radius: 4px;
 	margin: 8px;
 }
@@ -25,9 +39,9 @@ div {
 }
 
 .brython-dialog-main {
-	background-color: linen;
-	border-color: goldenrod;
-	box-shadow: 0px 4px 8px 4px sienna;
+	background-color: var(--colorBackground);
+	border-color: var(--colorDialogBorder);
+	box-shadow: 0px 4px 8px 4px var(--colorDialogShadow);
 }
 
 .brython-dialog-title {
@@ -38,7 +52,7 @@ div {
 .brython-dialog-close {
 	float: right;
 	padding: 0px 4px 0px 4px;
-	border: 2px outset goldenrod;
+	border: 2px outset var(--colorDialogBorder);
 }
 
 table.minorGroup {
@@ -52,14 +66,14 @@ table {
 th {
 	border-style: hidden dotted dotted dotted;
 	border-width: 4px;
-	border-color: tan;
+	border-color: var(--colorTableHeadBorder);
 }
 
 td {
 	padding-left: 4px;
 	border-style: hidden dotted dotted dotted;
 	border-width: 0px 2px 1px 2px;
-	border-color: tan;
+	border-color: var(--colorTableDataBorder);
 }
 
 td.tdWithInput {
@@ -103,15 +117,15 @@ input[type = "button"], input[type = "checkbox"], input[type = "radio"], .brytho
 }
 
 input[type = "button"], input:not([type]), input[type = "number"], .brython-dialog-button {
-	background-color: peachpuff;
-	border: 2px inset sandybrown;
+	background-color: var(--colorInputBGActive);
+	border: 2px inset var(--colorInputBorder);
 	border-radius: 2px;
 	margin: 2px;
 	text-align: center;
 }
 
-input[type = "number"][readonly], input:not([type])[readonly] {
-	background-color: linen;
+input[type = "number"][readonly], input:not([type])[readonly], input[type = "button"][disabled] {
+	background-color: var(--colorBackground);
 }
 
 input:not([type]), input[type = "number"] {
@@ -123,9 +137,9 @@ input:not([type]), input[type = "number"] {
 }
 
 input[type = "button"], .brython-dialog-button {
-	border: 4px outset sandybrown;
+	border: 4px outset var(--colorInputBorder);
 	border-radius: 2px;
-	box-shadow: 0px 4px saddlebrown;
+	box-shadow: 0px 4px var(--colorButtonShadow);
 	text-align: initial;
 	position: relative;
 }
@@ -150,7 +164,7 @@ input[type = "button"]:active:not([disabled]), .brython-dialog-button:active {
 }
 
 input.dialogName, #classList, #class.bio {
-	width:240px;
+	width: 240px;
 }
 
 input#description, #name.bio, #race.bio {
@@ -158,7 +172,7 @@ input#description, #name.bio, #race.bio {
 }
 
 .bio {
-	background-color: peachpuff;
+	background-color: var(--colorInputBGActive);
 	width: auto;
 }
 
@@ -169,7 +183,7 @@ input#description, #name.bio, #race.bio {
 }
 
 .ability, .abilityBonus {
-	background-color: peachpuff;
+	background-color: var(--colorInputBGActive);
 	height: 36pt;
 	width: 60px;
 }
@@ -202,7 +216,7 @@ input#description, #name.bio, #race.bio {
 }
 
 .currency {
-	background-color: peachpuff;
+	background-color: var(--colorInputBGActive);
 	width: 80px;
 }
 /*
@@ -247,21 +261,18 @@ input#description, #name.bio, #race.bio {
 
 #armorDiv {
 	text-align: center;
-	grid-row-start 4;
-	grid-column: 1 / span 2;
+	grid-row: 3 / span 3;
+	grid-column-start: 2;
 }
 
 #armorOptions {
 	text-align: left;
-	width: 40%;
-	margin: auto;
-	padding-left: %;
 }
 
 #currency {
 	text-align: center;
-	grid-row: 3 / span 2;
-	grid-column-start: 2;
+	grid-row-start: 4;
+	grid-column-start: 1;
 }
 
 /*
@@ -310,22 +321,22 @@ input#description, #name.bio, #race.bio {
 	}
 
 	#skillsDiv {
-		grid-row: 4 / span 2;
+		grid-row: 4 / span 3;
 		grid-column: 1  / span 2;
 	}
 
 	#featuresDiv {
-		grid-row: 5 / span 3;
+		grid-row: 5 / span 4;
 		grid-column: 3 / span 2;
 	}
 
 	#itemsDiv {
-		grid-row-start: 8;
+		grid-row-start: 9;
 		grid-column: 1 / span 4;
 	}
 
 	#spellsDiv {
-		grid-row-start: 9;
+		grid-row-start: 10;
 		grid-column: 1 / span 4;
 	}
 }
@@ -346,9 +357,13 @@ input#description, #name.bio, #race.bio {
 	}
 
 	#statistics {
-		grid-row-start: 4;;
+		grid-row-start: 4;
 		grid-column: 1 / span 4;
 		display: grid;
+	}
+
+	#currency {
+		grid-row-end: span 3;
 	}
 
 	#skillsDiv {

@@ -175,7 +175,7 @@ def adjustClass(event):
 
 		levelSyncCheck()
 		editClassDialog.close()
-		reloadValues()
+		reloadValues(refreshTables = False)
 
 	editClassDialog.ok_button.bind("click", okHandler)
 
@@ -221,7 +221,7 @@ def adjustWHeight(event):
 			return
 
 		editWHeightDialog.close()
-		reloadValues()
+		reloadValues(refreshTables = False)
 	
 	editWHeightDialog.ok_button.bind("click", okHandler)
 
@@ -531,7 +531,7 @@ def setLevel(event):
 			]
 			levelSyncCheck()
 			levelSetDialog.close()
-			reloadValues()
+			reloadValues(refreshTables = False)
 		except ValueError:
 			dialog.InfoDialog(
 				"Value Error", "Please enter an integer number.",
@@ -569,7 +569,7 @@ def adjustExperience(event):
 
 			levelSyncCheck()
 			addExperienceDialog.close()
-			reloadValues()
+			reloadValues(refreshTables = False)
 		except ValueError:
 			dialog.InfoDialog(
 				"Value Error", "Please enter an integer.",
@@ -683,25 +683,25 @@ def exchangeCoins(event):
 		event.target.value = data["currency"][event.target.id]
 		return
 
-	data["currency"][event.target.id] = int(event.target.value)
+	data["currency"][event.target.id] = amount
 
-	if event.target.id == "gold" or amount < 10:
-		refreshCurrencyTotal()
-		return
-	else:
+	if event.target.id != "gold" and  amount == 10:
 		event.target.value = 0
 
-	if event.target.id == "silver":
-		data["currency"]["silver"] = 0
-		data["currency"]["gold"] += 1
-	elif event.target.id == "copper":
-		data["currency"]["copper"] = 0
-		data["currency"]["silver"] += 1
-		if data["currency"]["silver"] == 10:
+		if event.target.id == "silver":
 			data["currency"]["silver"] = 0
 			data["currency"]["gold"] += 1
-	
-	reloadValues()
+			document["gold"].value = data["currency"]["gold"]
+		elif event.target.id == "copper":
+			data["currency"]["copper"] = 0
+			data["currency"]["silver"] += 1
+			document["silver"].value = data["currency"]["silver"]
+			if data["currency"]["silver"] == 10:
+				data["currency"]["silver"] = 0
+				data["currency"]["gold"] += 1
+				document["gold"].value = data["currency"]["gold"]
+
+	refreshCurrencyTotal()
 
 document["gold"].bind("input", exchangeCoins)
 document["silver"].bind("input", exchangeCoins)
@@ -1351,23 +1351,18 @@ def updateItemsTable():
 		document["items"] <= row
 
 # GENERAL/NETWORK/OTHER FUNCTIONS
-def reloadValues():
+def reloadValues(refreshTables = True):
 	global data
 	for k in data["biography"].keys():
-		#print(k, data["biography"][k], sep = ": ")
 		if k not in ("class", "height", "weight"):
 			document[k].value = data["biography"][k]
-			#print("(regular)")
 		elif k == "class":
 			document[k].value = ", ".join(data["biography"][k])
-			#print("(class)")
 		else:
 			document[k].value = str(data["biography"][k]["measure"]) \
 				+ ' ' + data["biography"][k]["unit"]
-			#print("(height/weight)")
 
 	refreshAbilityScores()
-	#print(data["hit"]["deathSaves"])
 
 	document["currentHit`Value"].value = data["hit"]["current"]
 	document["maxHit"].value = data["hit"]["max"]
@@ -1402,13 +1397,11 @@ def reloadValues():
 	document["nextExperience"].value = data["experience"]["next"]
 	updateClassLevelDivs()
 
-	#document["armorClass`Value"].value = data["armorClass"]
 	for r in document.select("input[name=\"armor\"]"):
 		if r.id.split('`')[0] == data["armorType"]:
 			r.checked = True
 			r.dispatchEvent(window.InputEvent.new("input"))
 			break
-	#refreshArmorDisplay()
 
 	refreshCurrencyTotal()
 	for coin in coins:
@@ -1418,11 +1411,11 @@ def reloadValues():
 		data["experience"]["level"]["character"]
 	)
 	document["proficiency"].value = data["proficiency"]["bonus"]
-	updateSkillsTable()
 
-	updateFeaturesTable()
-
-	updateItemsTable()
+	if refreshTables:
+		updateSkillsTable()
+		updateFeaturesTable()
+		updateItemsTable()
 
 def jsonHandler(response):
 	global data
