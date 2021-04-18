@@ -267,7 +267,10 @@ def adjustWHeight(event):
 document["wheightEdit"].bind("click", adjustWHeight)
 
 # ABILITY SCORE FUNCTIONS
-def refreshAbilityScores():
+def calculateAbilityBonus(score : int) -> int:
+	return (score - 10) // 2
+
+def refreshAbilityScores(initial = False):
 	modifications = {
 		a: 0
 		for a in data["abilities"].keys()
@@ -281,23 +284,34 @@ def refreshAbilityScores():
 				abilityTranslator[data["features"][f]["ability"]]
 			] += data["features"][f]["value"]
 
+	noChangesBonuses = []
+
 	if False in [m == 0 for m in modifications.values()]:
 		for k in data["abilities"].keys():
 			score = data["abilities"][k]["score"] + modifications[k]
+			if not initial:
+				noChangesBonuses.append(
+					int(document[k + "Bonus"].value) == calculateAbilityBonus(score)
+				)
 			document[k].value = score
 			document[k + "Bonus"].value = calculateAbilityBonus(score)
 
 	else:
 		for k in data["abilities"].keys():
+			if not initial:
+				noChangesBonuses.append(
+					int(document[k + "Bonus"].value) == data["abilities"][k]["bonus"]
+				)
 			document[k].value = data["abilities"][k]["score"]
 			document[k + "Bonus"].value = data["abilities"][k]["bonus"]
 	
-	refreshArmorDisplay()
-	updateSkillsTable()
-	updateItemsTable()
-
-def calculateAbilityBonus(score : int) -> int:
-	return (score - 10) // 2
+	#print(noChangesBonuses)
+	if False in noChangesBonuses:
+		#print("Refreshing all ability-derived panels...")
+		refreshArmorDisplay()
+		updateSkillsTable()
+		updateItemsTable()
+		#print("Refresh complete.")
 
 def syncAbilityScore(ability : str, newValue : int):
 	newBonus = calculateAbilityBonus(newValue)
@@ -1445,7 +1459,7 @@ def reloadValues(refreshTables = True):
 			document[k].value = str(data["biography"][k]["measure"]) \
 				+ ' ' + data["biography"][k]["unit"]
 
-	refreshAbilityScores()
+	refreshAbilityScores(initial = True)
 
 	document["currentHit`Value"].value = data["hit"]["current"]
 	document["maxHit"].value = data["hit"]["max"]
