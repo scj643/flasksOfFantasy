@@ -38,6 +38,12 @@ div {
 	padding: 4px;
 }
 
+.itemIconSelector {
+	background-color: var(--colorBackground);
+	display: grid;
+	grid-template-columns: auto auto auto auto;
+}
+
 .brython-dialog-main {
 	background-color: var(--colorBackground);
 	border-color: var(--colorDialogBorder);
@@ -93,7 +99,7 @@ td.featureDesc {
 }
 
 td.itemName {
-	width: 12%;
+	width: 11%;
 }
 
 td.itemDesc {
@@ -116,7 +122,7 @@ input[type = "button"], input[type = "checkbox"], input[type = "radio"], .brytho
 	text-align: right;
 }
 
-input[type = "button"], input:not([type]), input[type = "number"], .brython-dialog-button {
+input[type = "button"], input:not([type]), input[type = "number"], .brython-dialog-button, button {
 	background-color: var(--colorInputBGActive);
 	border: 2px inset var(--colorInputBorder);
 	border-radius: 2px;
@@ -136,7 +142,11 @@ input:not([type]), input[type = "number"] {
 	width: 60px;
 }
 
-input[type = "button"], .brython-dialog-button {
+.itemNumericCell {
+	width: 80px;
+}
+
+input[type = "button"], .brython-dialog-button, button {
 	border: 4px outset var(--colorInputBorder);
 	border-radius: 2px;
 	box-shadow: 0px 4px var(--colorButtonShadow);
@@ -148,6 +158,19 @@ input[type = "button"]:not(.skillButton):not(.featureButton):not(.itemButton) {
 	bottom: 4px;
 }
 
+button {
+	font-size: 16pt;
+	width: auto;
+}
+
+.selectIcon {
+	margin-bottom: 4px;
+}
+
+.itemIcon::before {
+	content: "\01F532";
+}
+
 .brython-dialog-button {
 	bottom: 4px;
 	margin-top: 8px;
@@ -157,7 +180,7 @@ input[type = "button"]:not(.skillButton):not(.featureButton):not(.itemButton) {
 	bottom: 2px;
 }
 
-input[type = "button"]:active:not([disabled]), .brython-dialog-button:active {
+input[type = "button"]:active:not([disabled]), .brython-dialog-button:active, button:active {
 	border-style: inset;
 	transform: translateY(4px);
 	box-shadow: 0px 0px;

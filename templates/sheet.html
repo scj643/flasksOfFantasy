@@ -4,7 +4,8 @@
 		<script src = {{url_for("static", filename = "brython/brython.js")}}></script>
 		<script src = {{url_for("static", filename = "brython/brython_stdlib.js")}}></script>
 		<link rel = "stylesheet" href = {{url_for("static", filename = "sheetDefault.css")}}>
-		<meta charset = "utf-8">
+		<link rel = "stylesheet" href = {{url_for("static", filename = "sheetItemIcons.css")}}>
+		<meta charset = "UTF-8">
 		<meta id = "sheetName" content = "{{sheetName}}">
 		<meta id = "foo" content = "bar">
 		<p id = "user" hidden>{{username}}</p>
@@ -236,6 +237,7 @@
 				<table id = "itemsTable" class = "minorGroup">
 					<thead>
 						<tr>
+							<th>Icon</th>
 							<th>Name</th>
 							<th>Description</th>
 							<th>Count</th>
@@ -245,7 +247,7 @@
 							<th>Settings</th>
 						</tr>
 						<tr>
-							<th colspan = 5></th>
+							<th colspan = 6></th>
 							<th>Kind</th>
 							<th>Damage</th>
 							<th></th>

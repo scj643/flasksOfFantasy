@@ -1,0 +1,111 @@
+#U1F45A::before, button.itemIcon[value = "0A-clothing"]::before {
+	content: "\01F45A";
+}
+#U1F94B::before, button.itemIcon[value = "0A-gi"]::before {
+	content: "\01F94B";
+}
+#U1F9E3::before, button.itemIcon[value = "0A-sash"]::before {
+	content: "\01F9E3";
+}
+#U1F9E4::before, button.itemIcon[value = "0A-gloves"]::before {
+	content: "\01F9E4";
+}
+#U1F45E::before, button.itemIcon[value = "0A-footwear"]::before {
+	content: "\01F45E";
+}
+#U1F392::before, button.itemIcon[value = "0B-backpack"]::before {
+	content: "\01F392";
+}
+#U1F451::before, button.itemIcon[value = "0B-crown"]::before {
+	content: "\01F451";
+}
+#U1F3C5::before, button.itemIcon[value = "0B-amulet"]::before {
+	content: "\01F3C5";
+}
+#U1F48D::before, button.itemIcon[value = "0B-ring"]::before {
+	content: "\01F48D";
+}
+#U1F4FF::before, button.itemIcon[value = "0B-beads"]::before {
+	content: "\01F4FF";
+}
+#U1F528::before, button.itemIcon[value = "1A-hammer"]::before {
+	content: "\01F528";
+}
+#U26CFUFE0F::before, button.itemIcon[value = "1A-pickaxe"]::before {
+	content: "\026CF\0FE0F";
+}
+#U1FA93::before, button.itemIcon[value = "1A-axe"]::before {
+	content: "\01FA93";
+}
+#U1F3F9::before, button.itemIcon[value = "1B-bow"]::before {
+	content: "\01F3F9";
+}
+#U1F5E1UFE0F::before, button.itemIcon[value = "1C-blade"]::before {
+	content: "\01F5E1\0FE0F";
+}
+#U1F6E1UFE0F::before, button.itemIcon[value = "1C-shield"]::before {
+	content: "\01F6E1\0FE0F";
+}
+#U26D3UFE0F::before, button.itemIcon[value = "1D-chain"]::before {
+	content: "\026D3\0FE0F";
+}
+#U1F9F9::before, button.itemIcon[value = "1D-broom"]::before {
+	content: "\01F9F9";
+}
+#U1F9AF::before, button.itemIcon[value = "1D-staff"]::before {
+	content: "\01F9AF";
+}
+#U1FA80::before, button.itemIcon[value = "1D-other"]::before {
+	content: "\01FA80";
+}
+#U1F5DDUFE0F::before, button.itemIcon[value = "2A-key"]::before {
+	content: "\01F5DD\0FE0F";
+}
+#U1F4B0::before, button.itemIcon[value = "2A-treasure"]::before {
+	content: "\01F4B0";
+}
+#U2697UFE0F::before, button.itemIcon[value = "2A-alchemy"]::before {
+	content: "\02697\0FE0F";
+}
+#U1F3B2::before, button.itemIcon[value = "2A-die"]::before {
+	content: "\01F3B2";
+}
+#U1F52E::before, button.itemIcon[value = "2B-orb"]::before {
+	content: "\01F52E";
+}
+#U1F48E::before, button.itemIcon[value = "2B-gem"]::before {
+	content: "\01F48E";
+}
+#U2626UFE0F::before, button.itemIcon[value = "2B-artiface"]::before {
+	content: "\02626\0FE0F";
+}
+#U26B1UFE0F::before, button.itemIcon[value = "2B-urn"]::before {
+	content: "\026B1\0FE0F";
+}
+#U1F33C::before, button.itemIcon[value = "3-flower"]::before {
+	content: "\01F33C";
+}
+#U1F34E::before, button.itemIcon[value = "3-fruit"]::before {
+	content: "\01F34E";
+}
+#U1F41F::before, button.itemIcon[value = "3-fish"]::before {
+	content: "\01F41F";
+}
+#U1F356::before, button.itemIcon[value = "3-meat"]::before {
+	content: "\01F356";
+}
+#U1F3D5UFE0F::before, button.itemIcon[value = "4A-camping"]::before {
+	content: "\01F3D5\0FE0F";
+}
+#U1F4D6::before, button.itemIcon[value = "4B-book"]::before {
+	content: "\01F4D6";
+}
+#U1F4DC::before, button.itemIcon[value = "4B-scroll"]::before {
+	content: "\01F4DC";
+}
+#U1F56FUFE0F::before, button.itemIcon[value = "4A-candle"]::before {
+	content: "\01F56F\0FE0F";
+}
+#U1F58CUFE0F::before, button.itemIcon[value = "4B-brush"]::before {
+	content: "\01F58C\0FE0F";
+}

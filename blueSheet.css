@@ -1,0 +1,11 @@
+:root {
+	--colorBackground: lightsteelblue; /*Main Page Background*/
+	--colorDivBorder: steelblue; /*<div> Border*/
+	--colorDialogBorder: lightblue; /*Dialog Box Border*/
+	--colorDialogShadow: navy; /*Dialog Box Shadow*/
+	--colorInputBorder: dodgerblue; /*Input Field Border*/
+	--colorInputBGActive: skyblue; /*Input Field Active Background*/
+	--colorButtonShadow: navy; /*Button Lower Shadow*/
+	--colorTableHeadBorder: powderblue; /*Table Header Row Border*/
+	--colorTableDataBorder: powderblue; /*Table Data Row Border*/
+}

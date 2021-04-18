@@ -44,6 +44,45 @@ levelsAndEXPRequired = {
 	20: 355000,
 	21: float("inf")
 }
+itemIconDict = {
+	"0A-clothing": "U1F45A",
+	"0A-gi": "U1F94B",
+	"0A-sash": "U1F9E3",
+	"0A-gloves": "U1F9E4",
+	"0A-footwear": "U1F45E",
+	"0B-backpack": "U1F392",
+	"0B-crown": "U1F451",
+	"0B-amulet": "U1F3C5",
+	"0B-ring": "U1F48D",
+	"0B-beads": "U1F4FF",
+	"1A-hammer": "U1F528",
+	"1A-pickaxe": "U26CFUFE0F",
+	"1A-axe": "U1FA93",
+	"1B-bow": "U1F3F9",
+	"1C-blade": "U1F5E1UFE0F",
+	"1C-shield": "U1F6E1UFE0F",
+	"1D-chain": "U26D3UFE0F",
+	"1D-broom": "U1F9F9",
+	"1D-staff": "U1F9AF",
+	"1D-other": "U1FA80",
+	"2A-key": "U1F5DDUFE0F",
+	"2A-treasure": "U1F4B0",
+	"2A-alchemy": "U2697UFE0F",
+	"2A-die": "U1F3B2",
+	"2B-orb": "U1F52E",
+	"2B-gem": "U1F48E",
+	"2B-artiface": "U2626UFE0F",
+	"2B-urn": "U26B1UFE0F",
+	"3-flower": "U1F33C",
+	"3-fruit": "U1F34E",
+	"3-fish": "U1F41F",
+	"3-meat": "U1F356",
+	"4A-camping": "U1F3D5UFE0F",
+	"4B-book": "U1F4D6",
+	"4B-scroll": "U1F4DC",
+	"4A-candle": "U1F56FUFE0F",
+	"4B-brush": "U1F58CUFE0F"
+}
 
 # BIOGRAPHY FUNCTIONS
 def toggleEditing(event, group):
@@ -1275,13 +1314,47 @@ def calculateTotalWorth() -> str:
 		".2f"
 	)
 
+
+def destroyIconSelectors(event):
+	for div in document.select(".itemIconSelector"):
+		del document[div.id]
+
+def makeItemIconDiv(event):
+	def clickHandler(clickEvent):
+		event.target.value = clickEvent.target.value
+		data["inventory"][event.target.id.split('`')[0]]["icon"] = \
+			clickEvent.target.value
+		destroyIconSelectors(window.Event.new("mouseleave"))
+
+	destroyIconSelectors(window.Event.new("mouseleave"))
+
+	itemID = '`'.join(event.target.id.split('`')[:2])
+	divID = itemID + "`IconSelect"
+
+	selector = html.DIV(
+		id = divID, Class = "itemIconSelector",
+		style = {
+			"position": "absolute",
+			"left": str(event.target.x) + "px",
+			"top": str(event.target.y) + "px"
+		}
+	)
+	selector.bind("mouseleave", destroyIconSelectors)
+
+	for k in sorted(itemIconDict.keys()):
+		iconDiv = html.BUTTON(id = itemIconDict[k], Class = "selectIcon", value = k)
+		iconDiv.bind("click", clickHandler)
+		selector <= iconDiv
+
+	document.select("body")[0] <= selector
+
 def updateItemsTable():
 	def makeWeaponKindString(kind : str) -> str:
 		if kind[0] == 's':
 			return kind[:6].capitalize() + ' ' + kind[6:]
 		else:
 			return kind[:7].capitalize() + ' ' + kind[7:]
-	
+
 	document["totalWeight"].value = calculateTotalWeight()
 	document["totalWorth"].value = calculateTotalWorth()
 
@@ -1290,6 +1363,16 @@ def updateItemsTable():
 	for k in sorted(data["inventory"].keys()):
 		inputID = k + "`Item"
 		row = html.TR(id = inputID + "`Row", Class = "itemRow")
+
+		iconSelector = html.BUTTON(
+			id = inputID + "`Icon", Class = "itemIcon",
+			name = inputID + "`Icon", value = ""
+		)
+		iconSelector.bind("click", makeItemIconDiv)
+		if "icon" in data["inventory"][k].keys():
+			iconSelector.value = data["inventory"][k]["icon"]
+		row <= html.TD(iconSelector)
+
 		row <= html.TD(html.H3(k), Class = "itemName")
 		row <= html.TD(data["inventory"][k]["description"], Class = "itemDesc")
 
