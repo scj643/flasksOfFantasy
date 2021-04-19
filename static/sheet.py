@@ -1284,6 +1284,8 @@ def adjustItem(event):
 					for coin in coins
 				}
 			}
+			if not creatingItem and "icon" in data["inventory"][item].keys():
+				newItem["icon"] = data["inventory"][item]["icon"]
 			if editItemDialog.select("#weaponCheck")[0].checked:
 				newItem["weapon"] = newItemWeapon
 
