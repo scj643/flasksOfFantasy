@@ -160,15 +160,15 @@ input[type = "button"]:not(.skillButton):not(.featureButton):not(.itemButton) {
 
 button {
 	font-size: 16pt;
+	border-width: 2px;
+	box-shadow 0px 2px var(--colorButtonShadow);
+	background-color: var(--colorBackground);
 	width: auto;
 }
 
 .selectIcon {
+	font-size: 24pt;
 	margin-bottom: 4px;
-}
-
-.itemIcon::before {
-	content: "\01F532";
 }
 
 .brython-dialog-button {
