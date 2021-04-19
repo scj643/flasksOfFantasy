@@ -1439,8 +1439,13 @@ def itemSortKey(key : str):
 			sortBy = r.value
 			break
 
-	if sortBy in ("icon", "count", "weight"):
+	if sortBy in ("count", "weight"):
 		return data["inventory"][key][sortBy]
+	elif sortBy == "icon":
+		if "icon" in data["inventory"][key].keys():
+			return data["inventory"][key]["icon"]
+		else:
+			return key
 	elif sortBy == "value":
 		valueDict = data["inventory"][key]["value"]
 		return round(
