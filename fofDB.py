@@ -1,5 +1,5 @@
 # IMPORTS
-from Crypto.Hash import SHA256 as sha
+from hashlib import sha256
 import sqlite3 as sql
 import os
 # NAME OF DB FILE
@@ -86,8 +86,7 @@ AND NAME = :name;""",
 		os.mkdir("./sheets")
 # Computer a hash h(p || s) for a password p and salt s
 def doHash(password : str, salt : str) -> str:
-	h = sha.new()
-	h.update(bytes(password + salt, "utf8"))
+	h = sha256(bytes(password + salt, "utf8"))
 	return h.hexdigest()
 # Check if an inputted password matches the recorded salted-hash
 def checkPassword(password : str, salt : str, hash : str) -> bool:
