@@ -120,7 +120,7 @@
 				<div id = "experience" class = "minorGroup">
 					<h3>Experience</h3>	
 					<input id = "experience`Add" type = "button" value = "Add">
-					<input id = "experience`Edit", type = "button" value = "Edit"> <br>
+					<input id = "experience`Edit" type = "button" value = "Edit"> <br>
 					<label for = "currentExperience">Experience Points</label>
 					<input id = "currentExperience" class = "experience" readonly> <br>
 					
@@ -237,6 +237,31 @@
 				<table id = "itemsTable" class = "minorGroup">
 					<thead>
 						<tr>
+							<th>
+								<input name = "sortItems" value = "icon" type = "radio">
+							</th>
+							<th>
+								<input name = "sortItems" value = "name" type = "radio" checked>
+							</th>
+							<th></th>
+							<th>
+								<input name = "sortItems" value = "count" type = "radio">
+							</th>
+							<th>
+								<input name = "sortItems" value = "weight" type = "radio">
+							</th>
+							<th>
+								<input name = "sortItems" value = "value" type = "radio">
+							</th>
+							<th>
+								<input name = "sortItems" value = "weaponKind" type = "radio">
+							</th>
+							<th>
+								<input name = "sortItems" value = "weaponDamage" type = "radio">
+							</th>
+							<th>Sort Key</th>
+						</tr>
+						<tr>
 							<th>Icon</th>
 							<th>Name</th>
 							<th>Description</th>
@@ -258,7 +283,7 @@
 				</table>
 			</div>
 			<div id = "spellsDiv" class = "majorGroup">
-				<h2>Spells<h2>
+				<h2>Spells</h2>
 				<input id = "Create Spell List``NewList" class = "spellButton" type = "button" value = "Create Spell List">
 				<div id = "spellTablesDiv" class = "minorGroup">
 				</div>

@@ -1433,7 +1433,51 @@ def makeItemIconDiv(event):
 
 	document.select("body")[0] <= selector
 
-def updateItemsTable():
+def itemSortKey(key : str):
+	for r in document.select("input[name = \"sortItems\"]"):
+		if r.checked:
+			sortBy = r.value
+			break
+
+	if sortBy in ("icon", "count", "weight"):
+		return data["inventory"][key][sortBy]
+	elif sortBy == "value":
+		valueDict = data["inventory"][key]["value"]
+		return round(
+			valueDict["gold"] + 0.1 * valueDict["silver"] + 0.01 * valueDict["copper"],
+			2
+		)
+	elif sortBy == "weaponKind":
+		if "weapon" in data["inventory"][key].keys():
+			return data["inventory"][key]["weapon"]["kind"]
+		else:
+			return "z" + key
+	elif sortBy == "weaponDamage":
+		if "weapon" in data["inventory"][key].keys():
+			damageDict = data["inventory"][key]["weapon"]["damage"]
+			return damageDict["type"][0].upper() + str(
+				damageDict["count"] * damageDict["die"] \
+					+ damageDict["bonus"] + int(
+						document[
+							abilityTranslator[damageDict["ability"]] + "Bonus"
+						].value
+					) + (
+						data["proficiency"]["bonus"] if damageDict["proficient"] \
+							else 0
+					)
+				)
+		else:
+			return "A" + key
+	else:
+		return key
+
+def itemSortHelper(event):
+	if event.target.value in ("count", "weight", "value", "weaponDamage"):
+		updateItemsTable(sortReverse = True)
+	else:
+		updateItemsTable()
+
+def updateItemsTable(sortReverse = False):
 	def makeWeaponKindString(kind : str) -> str:
 		if kind[0] == 's':
 			return kind[:6].capitalize() + ' ' + kind[6:]
@@ -1445,7 +1489,7 @@ def updateItemsTable():
 
 	for row in document.select("tr.itemRow"):
 		del document[row.id]
-	for k in sorted(data["inventory"].keys()):
+	for k in sorted(data["inventory"].keys(), key = itemSortKey, reverse = sortReverse):
 		inputID = k + "`Item"
 		row = html.TR(id = inputID + "`Row", Class = "itemRow")
 
@@ -1520,6 +1564,9 @@ def updateItemsTable():
 		row <= itemSettingsCell
 
 		document["items"] <= row
+
+for r in document.select("input[name = \"sortItems\"]"):
+	r.bind("change", itemSortHelper)
 
 # GENERAL/NETWORK/OTHER FUNCTIONS
 def reloadValues(refreshTables = True):
